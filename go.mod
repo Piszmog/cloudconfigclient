@@ -1,3 +1,3 @@
 module github.com/Piszmog/cloudconfigclient
 
-require github.com/pkg/errors v0.8.0
+require github.com/Piszmog/cfservices v1.1.0

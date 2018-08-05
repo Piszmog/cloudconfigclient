@@ -2,8 +2,13 @@ package main
 
 import (
 	"fmt"
+	"github.com/Piszmog/cfservices"
+	"github.com/Piszmog/cfservices/credentials"
 	"github.com/Piszmog/cloudconfigclient/configuration"
 	"github.com/Piszmog/cloudconfigclient/resource"
+	"github.com/pkg/errors"
+	"os"
+	"strings"
 )
 
 type File struct {
@@ -15,18 +20,54 @@ type Example struct {
 }
 
 func main() {
+	serviceCreds, err := GetLocalCredentials()
+	if err != nil {
+		panic(err)
+	}
+	var urls []string
+	for _, cred := range serviceCreds.Credentials {
+		urls = append(urls, cred.Uri)
+	}
 	file := &File{}
-	resourceClient := resource.CreateClient("http://localhost:8880")
-	err := resourceClient.GetFileFromBranch("develop", "temp", "temp1.json", file)
+	resourceClient := resource.CreateClient(urls...)
+	err = resourceClient.GetFileFromBranch("develop", "temp", "temp1.json", file)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Printf("%+v\n", file)
 
-	configClient := configuration.CreateClient("http://localhost:8880")
+	configClient := configuration.CreateClient(urls...)
 	configurations, err := configClient.GetConfiguration("exampleapp", []string{"dev"})
 	if err != nil {
 		panic(err)
 	}
 	fmt.Printf("%+v", configurations)
+}
+
+func GetLocalCredentials() (*credentials.ServiceCredentials, error) {
+	localUrls := os.Getenv("CONFIG_SERVER_URLS")
+	if len(localUrls) == 0 {
+		return nil, errors.Errorf("No local Config Server URLs provided in environment variable %s", "CONFIG_SERVER_URLS")
+	}
+	urls := strings.Split(localUrls, ",")
+	var creds []credentials.Credentials
+	for _, url := range urls {
+		creds = append(creds, credentials.Credentials{
+			Uri: url,
+		})
+	}
+	return &credentials.ServiceCredentials{Credentials: creds}, nil
+}
+
+func GetCloudCredentialsByDefaultName() (*credentials.ServiceCredentials, error) {
+	return GetCloudCredentials("p-config-server")
+}
+
+func GetCloudCredentials(name string) (*credentials.ServiceCredentials, error) {
+	vcapServices := cfservices.LoadFromEnvironment()
+	serviceCreds, err := cfservices.GetServiceCredentials(name, vcapServices)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get credentials for the Config Server")
+	}
+	return serviceCreds, nil
 }
