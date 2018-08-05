@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/Piszmog/cloudconfigclient/configuration"
 	"github.com/Piszmog/cloudconfigclient/resource"
 )
 
@@ -15,20 +16,17 @@ type Example struct {
 
 func main() {
 	file := &File{}
-	client := resource.CreateClient("http://localhost:8880")
-	err := client.GetFileFromBranch("develop", "temp", "temp1.json", file)
+	resourceClient := resource.CreateClient("http://localhost:8880")
+	err := resourceClient.GetFileFromBranch("develop", "temp", "temp1.json", file)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%+v", file)
+	fmt.Printf("%+v\n", file)
 
-	//configClient := configuration.Client{
-	//	BaseUrl:    "http://localhost:8880",
-	//	HttpClient: net.CreateDefaultHttpClient(),
-	//}
-	//configurations, err := configClient.GetConfiguration("exampleapp", []string{"dev"})
-	//if err != nil {
-	//	panic(err)
-	//}
-	//fmt.Printf("%+v", configurations)
+	configClient := configuration.CreateClient("http://localhost:8880")
+	configurations, err := configClient.GetConfiguration("exampleapp", []string{"dev"})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("%+v", configurations)
 }
