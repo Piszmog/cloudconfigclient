@@ -1,4 +1,5 @@
 # Go Config Server Client
+[![Build Status](https://travis-ci.org/Piszmog/cloudconfigclient.svg?branch=develop)](https://travis-ci.org/Piszmog/cloudconfigclient)
 [![GitHub release](https://img.shields.io/github/release/Piszmog/cloudconfigclient.svg)](https://github.com/Piszmog/cloudconfigclient/releases/latest)
 
 Go library for Spring Config Server. Inspired by the Java library [Cloud Config Client](https://github.com/Piszmog/cloud-config-client)

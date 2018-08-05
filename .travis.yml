@@ -1,0 +1,30 @@
+language: go
+
+go:
+- "1.10"
+
+notifications:
+  email:
+    on_success: never
+    on_failure: always
+
+matrix:
+  # It's ok if our code fails on unstable development versions of Go.
+  allow_failures:
+  - go: develop
+  # Don't wait for tip tests to finish. Mark the test run green if the
+  # tests pass on the stable versions of Go.
+  fast_finish: true
+cache:
+  directories:
+  - $GOPATH/pkg
+  - $GOPATH/bin
+
+before_install:
+- go get -u golang.org/x/vgo
+
+install:
+- vgo mod -vendor
+
+script:
+- go test -v
