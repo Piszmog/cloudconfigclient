@@ -27,4 +27,4 @@ install:
 - vgo mod -vendor
 
 script:
-- go test -v
+- go test -v ./...

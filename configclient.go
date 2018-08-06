@@ -11,6 +11,12 @@ import (
 	"strings"
 )
 
+const (
+	DefaultConfigServerName          = "p-config-server"
+	EnvironmentLocalConfigServerUrls = "CONFIG_SERVER_URLS"
+)
+
+// just for testing
 type File struct {
 	Example Example `json:"example"`
 }
@@ -19,6 +25,7 @@ type Example struct {
 	Field3 string `json:"field3"`
 }
 
+// just for testing -- remove after library built out
 func main() {
 	serviceCreds, err := GetLocalCredentials()
 	if err != nil {
@@ -45,9 +52,9 @@ func main() {
 }
 
 func GetLocalCredentials() (*credentials.ServiceCredentials, error) {
-	localUrls := os.Getenv("CONFIG_SERVER_URLS")
+	localUrls := os.Getenv(EnvironmentLocalConfigServerUrls)
 	if len(localUrls) == 0 {
-		return nil, errors.Errorf("No local Config Server URLs provided in environment variable %s", "CONFIG_SERVER_URLS")
+		return nil, errors.Errorf("No local Config Server URLs provided in environment variable %s", EnvironmentLocalConfigServerUrls)
 	}
 	urls := strings.Split(localUrls, ",")
 	var creds []credentials.Credentials
@@ -60,7 +67,7 @@ func GetLocalCredentials() (*credentials.ServiceCredentials, error) {
 }
 
 func GetCloudCredentialsByDefaultName() (*credentials.ServiceCredentials, error) {
-	return GetCloudCredentials("p-config-server")
+	return GetCloudCredentials(DefaultConfigServerName)
 }
 
 func GetCloudCredentials(name string) (*credentials.ServiceCredentials, error) {
