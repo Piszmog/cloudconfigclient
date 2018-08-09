@@ -2,9 +2,9 @@ package resource
 
 import (
 	"encoding/json"
+	"github.com/Piszmog/cloudconfigclient/client"
 	"github.com/Piszmog/cloudconfigclient/net"
 	"github.com/pkg/errors"
-	"net/http"
 )
 
 const (
@@ -18,36 +18,31 @@ type Resource interface {
 }
 
 type Client struct {
-	HttpClient *http.Client
-	BaseUrls   []string
-}
-
-func CreateClient(urls ...string) *Client {
-	return &Client{
-		HttpClient: net.CreateDefaultHttpClient(),
-		BaseUrls:   urls,
-	}
+	configClient client.ConfigClient
 }
 
 func (client *Client) GetFile(directory string, file string, interfaceType interface{}) error {
 	fileFound := false
-	for _, baseUrl := range client.BaseUrls {
-		fullUrl := net.CreateUrl(baseUrl, defaultApplicationName, defaultApplicationProfile, directory, file) + "?useDefaultLabel=true"
-		resp, err := client.HttpClient.Get(fullUrl)
+	for _, configClient := range client.configClient.Clients {
+		resp, err := configClient.Get(defaultApplicationName, defaultApplicationProfile, directory, file+"?useDefaultLabel=true")
 		if resp != nil && resp.StatusCode == 404 {
 			continue
 		}
 		if err != nil {
-			return errors.Wrapf(err, "failed to retrieve file from %s", fullUrl)
+			return errors.Wrapf(err, "failed to retrieve file from %s",
+				configClient.GetFullUrl(defaultApplicationName, defaultApplicationProfile, directory, file+"?useDefaultLabel=true"))
 		}
 		if resp.StatusCode != 200 {
-			return errors.Errorf("server responded with status code %d from url %s", resp.StatusCode, fullUrl)
+			return errors.Errorf("server responded with status code %d from url %s",
+				resp.StatusCode,
+				configClient.GetFullUrl(defaultApplicationName, defaultApplicationProfile, directory, file+"?useDefaultLabel=true"))
 		}
 		decoder := json.NewDecoder(resp.Body)
 		err = decoder.Decode(interfaceType)
 		resp.Body.Close()
 		if err != nil {
-			return errors.Wrapf(err, "failed to decode response from url %s", fullUrl)
+			return errors.Wrapf(err, "failed to decode response from url %s",
+				configClient.GetFullUrl(defaultApplicationName, defaultApplicationProfile, directory, file+"?useDefaultLabel=true"))
 		}
 		fileFound = true
 	}

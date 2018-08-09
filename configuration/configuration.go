@@ -2,47 +2,41 @@ package configuration
 
 import (
 	"encoding/json"
-	"github.com/Piszmog/cloudconfigclient/model"
+	"github.com/Piszmog/cloudconfigclient/client"
 	"github.com/Piszmog/cloudconfigclient/net"
 	"github.com/pkg/errors"
-	"net/http"
 )
 
 type Configuration interface {
-	GetConfiguration(applicationName string, profiles []string) (*model.Configuration, error)
+	GetConfiguration(applicationName string, profiles []string) (*Source, error)
 }
 
 type Client struct {
-	HttpClient *http.Client
-	BaseUrls   []string
+	configClient client.ConfigClient
 }
 
-func CreateClient(urls ...string) *Client {
-	return &Client{
-		HttpClient: net.CreateDefaultHttpClient(),
-		BaseUrls:   urls,
-	}
-}
-
-func (client *Client) GetConfiguration(applicationName string, profiles []string) (*model.Configuration, error) {
-	for _, baseUrl := range client.BaseUrls {
-		fullUrl := net.CreateUrl(baseUrl, applicationName, net.JoinProfiles(profiles))
-		resp, err := client.HttpClient.Get(fullUrl)
+func (client *Client) GetConfiguration(applicationName string, profiles []string) (*Source, error) {
+	for _, configClient := range client.configClient.Clients {
+		resp, err := configClient.Get(applicationName, net.JoinProfiles(profiles))
 		if resp != nil && resp.StatusCode == 404 {
 			continue
 		}
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to retrieve application configurations from %s", fullUrl)
+			return nil, errors.Wrapf(err, "failed to retrieve application configurations from %s",
+				configClient.GetFullUrl(applicationName, net.JoinProfiles(profiles)))
 		}
 		if resp.StatusCode != 200 {
-			return nil, errors.Errorf("server responded with status code %d from url %s", resp.StatusCode, fullUrl)
+			return nil, errors.Errorf("server responded with status code %d from url %s",
+				resp.StatusCode,
+				configClient.GetFullUrl(applicationName, net.JoinProfiles(profiles)))
 		}
-		configuration := &model.Configuration{}
+		configuration := &Source{}
 		decoder := json.NewDecoder(resp.Body)
 		err = decoder.Decode(configuration)
 		resp.Body.Close()
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to decode response from url %s", fullUrl)
+			return nil, errors.Wrapf(err, "failed to decode response from url %s",
+				configClient.GetFullUrl(applicationName, net.JoinProfiles(profiles)))
 		}
 		return configuration, nil
 	}

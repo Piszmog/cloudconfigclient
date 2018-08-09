@@ -1,6 +1,6 @@
-package model
+package configuration
 
-type Configuration struct {
+type Source struct {
 	Name            string           `json:"name"`
 	Profiles        []string         `json:"profiles"`
 	Label           string           `json:"label"`
