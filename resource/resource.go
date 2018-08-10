@@ -3,7 +3,6 @@ package resource
 import (
 	"encoding/json"
 	"github.com/Piszmog/cloudconfigclient/client"
-	"github.com/Piszmog/cloudconfigclient/net"
 	"github.com/pkg/errors"
 )
 
@@ -18,7 +17,11 @@ type Resource interface {
 }
 
 type Client struct {
-	configClient client.ConfigClient
+	configClient *client.ConfigClient
+}
+
+func CreateResourceClient(configClient *client.ConfigClient) *Client {
+	return &Client{configClient: configClient}
 }
 
 func (client *Client) GetFile(directory string, file string, interfaceType interface{}) error {
@@ -54,23 +57,25 @@ func (client *Client) GetFile(directory string, file string, interfaceType inter
 
 func (client *Client) GetFileFromBranch(branch string, directory string, file string, interfaceType interface{}) error {
 	fileFound := false
-	for _, baseUrl := range client.BaseUrls {
-		fullUrl := net.CreateUrl(baseUrl, defaultApplicationName, defaultApplicationProfile, branch, directory, file)
-		resp, err := client.HttpClient.Get(fullUrl)
+	for _, configClient := range client.configClient.Clients {
+		resp, err := configClient.Get(defaultApplicationName, defaultApplicationProfile, branch, directory, file)
 		if resp != nil && resp.StatusCode == 404 {
 			continue
 		}
 		if err != nil {
-			return errors.Wrapf(err, "failed to retrieve file from %s", fullUrl)
+			return errors.Wrapf(err, "failed to retrieve file from %s",
+				configClient.GetFullUrl(defaultApplicationName, defaultApplicationProfile, branch, directory, file))
 		}
 		if resp.StatusCode != 200 {
-			return errors.Errorf("server responded with status code %d from url %s", resp.StatusCode, fullUrl)
+			return errors.Errorf("server responded with status code %d from url %s", resp.StatusCode,
+				configClient.GetFullUrl(defaultApplicationName, defaultApplicationProfile, branch, directory, file))
 		}
 		decoder := json.NewDecoder(resp.Body)
 		err = decoder.Decode(interfaceType)
 		resp.Body.Close()
 		if err != nil {
-			return errors.Wrapf(err, "failed to decode response from url %s", fullUrl)
+			return errors.Wrapf(err, "failed to decode response from url %s",
+				configClient.GetFullUrl(defaultApplicationName, defaultApplicationProfile, branch, directory, file))
 		}
 		fileFound = true
 	}

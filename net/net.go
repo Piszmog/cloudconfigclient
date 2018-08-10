@@ -20,7 +20,7 @@ func JoinProfiles(profiles []string) string {
 }
 
 func CreateDefaultHttpClient() *http.Client {
-	return CreateHttpClient(2*time.Second, 30*time.Second, 2*time.Second, 90*time.Second)
+	return CreateHttpClient(5*time.Second, 30*time.Second, 5*time.Second, 90*time.Second)
 }
 
 func CreateHttpClient(timeout time.Duration, keepAlive time.Duration, tlsHandshakeTimeout time.Duration, idleConnection time.Duration) *http.Client {

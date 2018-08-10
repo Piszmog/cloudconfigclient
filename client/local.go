@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	EnvironmentLocalConfigServerUrls = "CONFIG_SERVER_URLS"
+	environmentLocalConfigServerUrls = "CONFIG_SERVER_URLS"
 )
 
 func CreateLocalClient() ConfigClient {
@@ -24,9 +24,9 @@ func CreateLocalClient() ConfigClient {
 }
 
 func GetLocalCredentials() (*credentials.ServiceCredentials, error) {
-	localUrls := os.Getenv(EnvironmentLocalConfigServerUrls)
+	localUrls := os.Getenv(environmentLocalConfigServerUrls)
 	if len(localUrls) == 0 {
-		return nil, errors.Errorf("No local Config Server URLs provided in environment variable %s", EnvironmentLocalConfigServerUrls)
+		return nil, errors.Errorf("No local Config Server URLs provided in environment variable %s", environmentLocalConfigServerUrls)
 	}
 	urls := strings.Split(localUrls, ",")
 	var creds []credentials.Credentials

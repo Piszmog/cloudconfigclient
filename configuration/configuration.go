@@ -12,7 +12,11 @@ type Configuration interface {
 }
 
 type Client struct {
-	configClient client.ConfigClient
+	configClient *client.ConfigClient
+}
+
+func CreateconfigurationClient(configClient *client.ConfigClient) *Client {
+	return &Client{configClient: configClient}
 }
 
 func (client *Client) GetConfiguration(applicationName string, profiles []string) (*Source, error) {

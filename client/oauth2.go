@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	DefaultConfigServerName = "p-config-server"
+	defaultConfigServerName = "p-config-server"
 )
 
 func CreateCloudClient() ConfigClient {
@@ -22,8 +22,19 @@ func CreateCloudClient() ConfigClient {
 	return ConfigClient{Clients: configClients}
 }
 
+func CreateCloudClientForService(name string) ConfigClient {
+	serviceCredentials, _ := GetCloudCredentials(name)
+	configClients := make([]Client, len(serviceCredentials.Credentials))
+	for index, cred := range serviceCredentials.Credentials {
+		configUri := cred.Uri
+		client := net.CreateOAuth2Client(cred)
+		configClients[index] = Client{configUri: configUri, httpClient: client}
+	}
+	return ConfigClient{Clients: configClients}
+}
+
 func GetCloudCredentialsByDefaultName() (*credentials.ServiceCredentials, error) {
-	return GetCloudCredentials(DefaultConfigServerName)
+	return GetCloudCredentials(defaultConfigServerName)
 }
 
 func GetCloudCredentials(name string) (*credentials.ServiceCredentials, error) {
