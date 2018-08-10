@@ -2,16 +2,16 @@ package client
 
 import (
 	"github.com/Piszmog/cloudconfigclient/net"
+	"github.com/pkg/errors"
 	"net/http"
 )
 
-type CloudClient interface {
-	GetFullUrl(uriVariables ...string) string
-	Get(uriVariables ...string) (resp *http.Response, err error)
-}
-
 type ConfigClient struct {
 	Clients []Client
+}
+
+type CloudClient interface {
+	Get(uriVariables ...string) (resp *http.Response, err error)
 }
 
 type Client struct {
@@ -19,11 +19,8 @@ type Client struct {
 	httpClient *http.Client
 }
 
-func (client *Client) GetFullUrl(uriVariables ...string) string {
-	return net.CreateUrl(client.configUri, uriVariables...)
-}
-
 func (client *Client) Get(uriVariables ...string) (resp *http.Response, err error) {
 	fullUrl := net.CreateUrl(client.configUri, uriVariables...)
-	return client.httpClient.Get(fullUrl)
+	response, err := client.httpClient.Get(fullUrl)
+	return response, errors.Wrapf(err, "failed to retrieve from %s", fullUrl)
 }

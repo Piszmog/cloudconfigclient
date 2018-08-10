@@ -1,7 +1,7 @@
 package client
 
 import (
-	"github.com/Piszmog/cfservices/credentials"
+	"github.com/Piszmog/cfservices"
 	"github.com/Piszmog/cloudconfigclient/net"
 	"github.com/pkg/errors"
 	"os"
@@ -12,28 +12,31 @@ const (
 	environmentLocalConfigServerUrls = "CONFIG_SERVER_URLS"
 )
 
-func CreateLocalClient() ConfigClient {
-	serviceCredentials, _ := GetLocalCredentials()
+func CreateLocalClient() (*ConfigClient, error) {
+	serviceCredentials, err := GetLocalCredentials()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to create a local client")
+	}
 	configClients := make([]Client, len(serviceCredentials.Credentials))
 	for index, cred := range serviceCredentials.Credentials {
 		configUri := cred.Uri
 		client := net.CreateDefaultHttpClient()
 		configClients[index] = Client{configUri: configUri, httpClient: client}
 	}
-	return ConfigClient{Clients: configClients}
+	return &ConfigClient{Clients: configClients}, nil
 }
 
-func GetLocalCredentials() (*credentials.ServiceCredentials, error) {
+func GetLocalCredentials() (*cfservices.ServiceCredentials, error) {
 	localUrls := os.Getenv(environmentLocalConfigServerUrls)
 	if len(localUrls) == 0 {
 		return nil, errors.Errorf("No local Config Server URLs provided in environment variable %s", environmentLocalConfigServerUrls)
 	}
 	urls := strings.Split(localUrls, ",")
-	var creds []credentials.Credentials
+	var creds []cfservices.Credentials
 	for _, url := range urls {
-		creds = append(creds, credentials.Credentials{
+		creds = append(creds, cfservices.Credentials{
 			Uri: url,
 		})
 	}
-	return &credentials.ServiceCredentials{Credentials: creds}, nil
+	return &cfservices.ServiceCredentials{Credentials: creds}, nil
 }

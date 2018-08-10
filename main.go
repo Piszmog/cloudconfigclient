@@ -16,16 +16,20 @@ type Example struct {
 }
 
 func main() {
-	localClient := client.CreateLocalClient()
-	resourceClient := resource.CreateResourceClient(&localClient)
-	var file File
-	err := resourceClient.GetFile("temp", "temp1.json", &file)
+	//configClient := client.CreateLocalClient()
+	configClient, err := client.CreateCloudClient()
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%+v", file)
+	resourceClient := resource.CreateResourceClient(configClient)
+	var file File
+	err = resourceClient.GetFile("temp", "temp1.json", &file)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("%+v\n", file)
 
-	configurationClient := configuration.CreateConfigurationClient(&localClient)
+	configurationClient := configuration.CreateConfigurationClient(configClient)
 	config, err := configurationClient.GetConfiguration("application", []string{"dev"})
 	if err != nil {
 		panic(err)

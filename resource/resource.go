@@ -12,8 +12,8 @@ const (
 )
 
 type Resource interface {
-	GetFile(directory string, file string, interfaceType *interface{}) error
-	GetFileFromBranch(branch string, directory string, file string, interfaceType *interface{}) error
+	GetFile(directory string, file string, interfaceType interface{}) error
+	GetFileFromBranch(branch string, directory string, file string, interfaceType interface{}) error
 }
 
 type Client struct {
@@ -32,20 +32,16 @@ func (client *Client) GetFile(directory string, file string, interfaceType inter
 			continue
 		}
 		if err != nil {
-			return errors.Wrapf(err, "failed to retrieve file from %s",
-				configClient.GetFullUrl(defaultApplicationName, defaultApplicationProfile, directory, file+"?useDefaultLabel=true"))
+			return errors.Wrapf(err, "failed to retrieve file")
 		}
 		if resp.StatusCode != 200 {
-			return errors.Errorf("server responded with status code %d from url %s",
-				resp.StatusCode,
-				configClient.GetFullUrl(defaultApplicationName, defaultApplicationProfile, directory, file+"?useDefaultLabel=true"))
+			return errors.Errorf("server responded with status code %d", resp.StatusCode)
 		}
 		decoder := json.NewDecoder(resp.Body)
 		err = decoder.Decode(interfaceType)
 		resp.Body.Close()
 		if err != nil {
-			return errors.Wrapf(err, "failed to decode response from url %s",
-				configClient.GetFullUrl(defaultApplicationName, defaultApplicationProfile, directory, file+"?useDefaultLabel=true"))
+			return errors.Wrapf(err, "failed to decode response")
 		}
 		fileFound = true
 	}
@@ -63,19 +59,16 @@ func (client *Client) GetFileFromBranch(branch string, directory string, file st
 			continue
 		}
 		if err != nil {
-			return errors.Wrapf(err, "failed to retrieve file from %s",
-				configClient.GetFullUrl(defaultApplicationName, defaultApplicationProfile, branch, directory, file))
+			return errors.Wrapf(err, "failed to retrieve file")
 		}
 		if resp.StatusCode != 200 {
-			return errors.Errorf("server responded with status code %d from url %s", resp.StatusCode,
-				configClient.GetFullUrl(defaultApplicationName, defaultApplicationProfile, branch, directory, file))
+			return errors.Errorf("server responded with status code %d", resp.StatusCode)
 		}
 		decoder := json.NewDecoder(resp.Body)
 		err = decoder.Decode(interfaceType)
 		resp.Body.Close()
 		if err != nil {
-			return errors.Wrapf(err, "failed to decode response from url %s",
-				configClient.GetFullUrl(defaultApplicationName, defaultApplicationProfile, branch, directory, file))
+			return errors.Wrapf(err, "failed to decode response")
 		}
 		fileFound = true
 	}
