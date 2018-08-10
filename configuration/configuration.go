@@ -15,7 +15,7 @@ type Client struct {
 	configClient *client.ConfigClient
 }
 
-func CreateconfigurationClient(configClient *client.ConfigClient) *Client {
+func CreateConfigurationClient(configClient *client.ConfigClient) *Client {
 	return &Client{configClient: configClient}
 }
 

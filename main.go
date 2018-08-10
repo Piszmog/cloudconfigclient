@@ -25,7 +25,7 @@ func main() {
 	}
 	fmt.Printf("%+v", file)
 
-	configurationClient := configuration.CreateconfigurationClient(&localClient)
+	configurationClient := configuration.CreateConfigurationClient(&localClient)
 	config, err := configurationClient.GetConfiguration("application", []string{"dev"})
 	if err != nil {
 		panic(err)
