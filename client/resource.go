@@ -15,7 +15,7 @@ type Resource interface {
 	GetFileFromBranch(branch string, directory string, file string, interfaceType interface{}) error
 }
 
-func (configClient *ConfigClient) GetFile(directory string, file string, interfaceType interface{}) error {
+func (configClient ConfigClient) GetFile(directory string, file string, interfaceType interface{}) error {
 	fileFound := false
 	for _, client := range configClient.Clients {
 		resp, err := client.Get(defaultApplicationName, defaultApplicationProfile, directory, file+"?useDefaultLabel=true")

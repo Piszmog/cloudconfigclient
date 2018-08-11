@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	environmentLocalConfigServerUrls = "CONFIG_SERVER_URLS"
+	EnvironmentLocalConfigServerUrls = "CONFIG_SERVER_URLS"
 )
 
 func CreateLocalClient() (*ConfigClient, error) {
@@ -17,7 +17,7 @@ func CreateLocalClient() (*ConfigClient, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create a local client")
 	}
-	configClients := make([]Client, len(serviceCredentials.Credentials))
+	configClients := make([]CloudClient, len(serviceCredentials.Credentials))
 	for index, cred := range serviceCredentials.Credentials {
 		configUri := cred.Uri
 		client := net.CreateDefaultHttpClient()
@@ -27,9 +27,9 @@ func CreateLocalClient() (*ConfigClient, error) {
 }
 
 func GetLocalCredentials() (*cfservices.ServiceCredentials, error) {
-	localUrls := os.Getenv(environmentLocalConfigServerUrls)
+	localUrls := os.Getenv(EnvironmentLocalConfigServerUrls)
 	if len(localUrls) == 0 {
-		return nil, errors.Errorf("No local Config Server URLs provided in environment variable %s", environmentLocalConfigServerUrls)
+		return nil, errors.Errorf("No local Config Server URLs provided in environment variable %s", EnvironmentLocalConfigServerUrls)
 	}
 	urls := strings.Split(localUrls, ",")
 	var creds []cfservices.Credentials

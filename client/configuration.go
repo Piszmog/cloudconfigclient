@@ -24,7 +24,7 @@ type Configuration interface {
 	GetConfiguration(applicationName string, profiles []string) (*Source, error)
 }
 
-func (configClient *ConfigClient) GetConfiguration(applicationName string, profiles []string) (*Source, error) {
+func (configClient ConfigClient) GetConfiguration(applicationName string, profiles []string) (*Source, error) {
 	for _, client := range configClient.Clients {
 		resp, err := client.Get(applicationName, net.JoinProfiles(profiles))
 		if resp != nil && resp.StatusCode == 404 {

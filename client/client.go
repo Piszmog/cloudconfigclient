@@ -7,7 +7,7 @@ import (
 )
 
 type ConfigClient struct {
-	Clients []Client
+	Clients []CloudClient
 }
 
 type CloudClient interface {
@@ -19,7 +19,7 @@ type Client struct {
 	httpClient *http.Client
 }
 
-func (client *Client) Get(uriVariables ...string) (resp *http.Response, err error) {
+func (client Client) Get(uriVariables ...string) (resp *http.Response, err error) {
 	fullUrl := net.CreateUrl(client.configUri, uriVariables...)
 	response, err := client.httpClient.Get(fullUrl)
 	return response, errors.Wrapf(err, "failed to retrieve from %s", fullUrl)

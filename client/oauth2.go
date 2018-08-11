@@ -19,7 +19,7 @@ func CreateCloudClientForService(name string) (*ConfigClient, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create cloud client")
 	}
-	configClients := make([]Client, len(serviceCredentials.Credentials))
+	configClients := make([]CloudClient, len(serviceCredentials.Credentials))
 	for index, cred := range serviceCredentials.Credentials {
 		configUri := cred.Uri
 		client, err := net.CreateOAuth2Client(&cred)
