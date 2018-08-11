@@ -32,11 +32,11 @@ func GetLocalCredentials() (*cfservices.ServiceCredentials, error) {
 		return nil, errors.Errorf("No local Config Server URLs provided in environment variable %s", EnvironmentLocalConfigServerUrls)
 	}
 	urls := strings.Split(localUrls, ",")
-	var creds []cfservices.Credentials
-	for _, url := range urls {
-		creds = append(creds, cfservices.Credentials{
+	creds := make([]cfservices.Credentials, len(urls))
+	for index, url := range urls {
+		creds[index] = cfservices.Credentials{
 			Uri: url,
-		})
+		}
 	}
 	return &cfservices.ServiceCredentials{Credentials: creds}, nil
 }
