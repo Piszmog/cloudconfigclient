@@ -6,7 +6,21 @@ import (
 )
 
 const (
-	configurationSource = `{"name":"testConfig", "profiles":["profile"],"propertySources":[{"name":"test","source":{"field1":"value1", "field2":1}}]}`
+	configurationSource = `{
+  "name": "testConfig",
+  "profiles": [
+    "profile"
+  ],
+  "propertySources": [
+    {
+      "name": "test",
+      "source": {
+        "field1": "value1",
+        "field2": 1
+      }
+    }
+  ]
+}`
 )
 
 func TestConfigClient_GetConfiguration(t *testing.T) {
