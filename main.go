@@ -3,8 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/Piszmog/cloudconfigclient/client"
-	"github.com/Piszmog/cloudconfigclient/configuration"
-	"github.com/Piszmog/cloudconfigclient/resource"
 )
 
 type File struct {
@@ -16,21 +14,19 @@ type Example struct {
 }
 
 func main() {
-	//configClient := client.CreateLocalClient()
+	//configClient, err := client.CreateLocalClient()
 	configClient, err := client.CreateCloudClient()
 	if err != nil {
 		panic(err)
 	}
-	resourceClient := resource.CreateResourceClient(configClient)
 	var file File
-	err = resourceClient.GetFile("temp", "temp1.json", &file)
+	err = configClient.GetFile("temp", "temp1.json", &file)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Printf("%+v\n", file)
 
-	configurationClient := configuration.CreateConfigurationClient(configClient)
-	config, err := configurationClient.GetConfiguration("application", []string{"dev"})
+	config, err := configClient.GetConfiguration("testapp", []string{"dev"})
 	if err != nil {
 		panic(err)
 	}

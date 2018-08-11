@@ -15,14 +15,17 @@ func CreateCloudClient() (*ConfigClient, error) {
 }
 
 func CreateCloudClientForService(name string) (*ConfigClient, error) {
-	serviceCredentials, err := GetCloudCredentials(defaultConfigServerName)
+	serviceCredentials, err := GetCloudCredentials(name)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create cloud client")
 	}
 	configClients := make([]Client, len(serviceCredentials.Credentials))
 	for index, cred := range serviceCredentials.Credentials {
 		configUri := cred.Uri
-		client := net.CreateOAuth2Client(cred)
+		client, err := net.CreateOAuth2Client(&cred)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to create oauth2 client for %s", configUri)
+		}
 		configClients[index] = Client{configUri: configUri, httpClient: client}
 	}
 	return &ConfigClient{Clients: configClients}, nil

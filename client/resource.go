@@ -1,8 +1,7 @@
-package resource
+package client
 
 import (
 	"encoding/json"
-	"github.com/Piszmog/cloudconfigclient/client"
 	"github.com/pkg/errors"
 )
 
@@ -16,18 +15,10 @@ type Resource interface {
 	GetFileFromBranch(branch string, directory string, file string, interfaceType interface{}) error
 }
 
-type Client struct {
-	configClient *client.ConfigClient
-}
-
-func CreateResourceClient(configClient *client.ConfigClient) *Client {
-	return &Client{configClient: configClient}
-}
-
-func (client *Client) GetFile(directory string, file string, interfaceType interface{}) error {
+func (configClient *ConfigClient) GetFile(directory string, file string, interfaceType interface{}) error {
 	fileFound := false
-	for _, configClient := range client.configClient.Clients {
-		resp, err := configClient.Get(defaultApplicationName, defaultApplicationProfile, directory, file+"?useDefaultLabel=true")
+	for _, client := range configClient.Clients {
+		resp, err := client.Get(defaultApplicationName, defaultApplicationProfile, directory, file+"?useDefaultLabel=true")
 		if resp != nil && resp.StatusCode == 404 {
 			continue
 		}
@@ -51,10 +42,10 @@ func (client *Client) GetFile(directory string, file string, interfaceType inter
 	return nil
 }
 
-func (client *Client) GetFileFromBranch(branch string, directory string, file string, interfaceType interface{}) error {
+func (configClient *ConfigClient) GetFileFromBranch(branch string, directory string, file string, interfaceType interface{}) error {
 	fileFound := false
-	for _, configClient := range client.configClient.Clients {
-		resp, err := configClient.Get(defaultApplicationName, defaultApplicationProfile, branch, directory, file)
+	for _, client := range configClient.Clients {
+		resp, err := client.Get(defaultApplicationName, defaultApplicationProfile, branch, directory, file)
 		if resp != nil && resp.StatusCode == 404 {
 			continue
 		}
