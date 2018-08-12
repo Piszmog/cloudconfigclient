@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	// Environment variable for setting base URLs for local Config Servers.
+	// EnvironmentLocalConfigServerUrls is an environment variable for setting base URLs for local Config Servers.
 	EnvironmentLocalConfigServerUrls = "CONFIG_SERVER_URLS"
 )
 
