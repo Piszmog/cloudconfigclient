@@ -6,6 +6,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// The application's source configurations. It con contain zero to n number of property sources.
 type Source struct {
 	Name            string           `json:"name"`
 	Profiles        []string         `json:"profiles"`
@@ -15,15 +16,21 @@ type Source struct {
 	PropertySources []PropertySource `json:"propertySources"`
 }
 
+// A property source for the application.
+//
+// A property source is either a YAML or a PROPERTIES file located in the repository that a Config Server is pointed at.
 type PropertySource struct {
 	Name   string                 `json:"name"`
 	Source map[string]interface{} `json:"source"`
 }
 
+// The configuration interface for retrieving an application's configuration files from the Config Server.
 type Configuration interface {
 	GetConfiguration(applicationName string, profiles []string) (*Source, error)
 }
 
+// GetConfiguration retrieves the configurations/property sources of an application based on the name of the application
+// and the profiles of the application.
 func (configClient ConfigClient) GetConfiguration(applicationName string, profiles []string) (*Source, error) {
 	for _, client := range configClient.Clients {
 		resp, err := client.Get(applicationName, net.JoinProfiles(profiles))

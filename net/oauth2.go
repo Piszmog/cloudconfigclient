@@ -8,6 +8,7 @@ import (
 	"net/http"
 )
 
+// CreateOAuth2Client creates an OAuth2 http.Client from the provided credentials.
 func CreateOAuth2Client(cred *cfservices.Credentials) (*http.Client, error) {
 	config, err := CreateOAuth2Config(cred)
 	if err != nil {
@@ -16,6 +17,7 @@ func CreateOAuth2Client(cred *cfservices.Credentials) (*http.Client, error) {
 	return config.Client(context.Background()), nil
 }
 
+// CreateOAuth2Config creates an OAuth2 config from the provided credentials.
 func CreateOAuth2Config(cred *cfservices.Credentials) (*clientcredentials.Config, error) {
 	if cred == nil {
 		return nil, errors.New("cannot create oauth2 config when credentials are nil")

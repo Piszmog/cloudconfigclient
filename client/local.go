@@ -9,9 +9,13 @@ import (
 )
 
 const (
+	// Environment variable for setting base URLs for local Config Servers.
 	EnvironmentLocalConfigServerUrls = "CONFIG_SERVER_URLS"
 )
 
+// CreateLocalClient creates a ConfigClient for a locally running Config Server.
+//
+// The ConfigClient's underlying http.Client is configured with timeouts and connection pools.
 func CreateLocalClient() (*ConfigClient, error) {
 	serviceCredentials, err := GetLocalCredentials()
 	if err != nil {
@@ -26,6 +30,9 @@ func CreateLocalClient() (*ConfigClient, error) {
 	return &ConfigClient{Clients: configClients}, nil
 }
 
+// GetLocalCredentials creates the credentials that are used to configure a ConfigClient to access a local Config Server.
+//
+// Retrieves the base URLs of Config Servers from the environment variable 'CONFIG_SERVER_URLS' - a comma separated list.
 func GetLocalCredentials() (*cfservices.ServiceCredentials, error) {
 	localUrls := os.Getenv(EnvironmentLocalConfigServerUrls)
 	if len(localUrls) == 0 {
