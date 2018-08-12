@@ -31,7 +31,7 @@ func CreateDefaultHttpClient() *http.Client {
 	return CreateHttpClient(5*time.Second, 30*time.Second, 5*time.Second, 90*time.Second)
 }
 
-// Creates a http.Client from the specified timeouts and keep alive.
+// CreateHttpClient creates a http.Client from the specified timeouts and keep alive.
 //
 // The client also has the maximum number of idle connections set to 100 and number of connections per host as 100.
 func CreateHttpClient(timeout time.Duration, keepAlive time.Duration, tlsHandshakeTimeout time.Duration, idleConnection time.Duration) *http.Client {

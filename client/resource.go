@@ -10,7 +10,7 @@ const (
 	defaultApplicationProfile = "default"
 )
 
-// The resource interface describes how to retrieve files from the Config Server.
+// Resource interface describes how to retrieve files from the Config Server.
 type Resource interface {
 	GetFile(directory string, file string, interfaceType interface{}) error
 	GetFileFromBranch(branch string, directory string, file string, interfaceType interface{}) error

@@ -6,7 +6,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-// The application's source configurations. It con contain zero to n number of property sources.
+// Source is the application's source configurations. It con contain zero to n number of property sources.
 type Source struct {
 	Name            string           `json:"name"`
 	Profiles        []string         `json:"profiles"`
@@ -16,7 +16,7 @@ type Source struct {
 	PropertySources []PropertySource `json:"propertySources"`
 }
 
-// A property source for the application.
+// PropertySource is the property source for the application.
 //
 // A property source is either a YAML or a PROPERTIES file located in the repository that a Config Server is pointed at.
 type PropertySource struct {
@@ -24,7 +24,7 @@ type PropertySource struct {
 	Source map[string]interface{} `json:"source"`
 }
 
-// The configuration interface for retrieving an application's configuration files from the Config Server.
+// Configuration interface for retrieving an application's configuration files from the Config Server.
 type Configuration interface {
 	GetConfiguration(applicationName string, profiles []string) (*Source, error)
 }

@@ -6,12 +6,12 @@ import (
 	"net/http"
 )
 
-// Client for the Config Server
+// ConfigClient contains the clients of the Config Servers.
 type ConfigClient struct {
 	Clients []CloudClient
 }
 
-// Client interacting with the Config Server's REST APIs
+// CloudClient interacts with the Config Server's REST APIs
 type CloudClient interface {
 	Get(uriVariables ...string) (resp *http.Response, err error)
 }
