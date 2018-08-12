@@ -25,3 +25,10 @@ func TestJoinProfiles(t *testing.T) {
 		t.Errorf("profiles were not append")
 	}
 }
+
+func TestCreateDefaultHttpClient(t *testing.T) {
+	client := CreateDefaultHttpClient()
+	if client == nil {
+		t.Errorf("failed to create configuration client")
+	}
+}
