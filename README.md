@@ -123,4 +123,4 @@ Spring's Config Server allows two ways to retrieve files from a backing reposito
 The functions available to retrieve resource files are, `GetFile(directory string, file string, interfaceType interface{}) error` and 
 `GetFileFromBranch(branch string, directory string, file string, interfaceType interface{})`.
 
-* The `interfaceTypee` is the object to deserialize the file to
+* The `interfaceType` is the object to deserialize the file to
