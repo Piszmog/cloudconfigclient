@@ -108,7 +108,7 @@ The loaded configurations are in the following JSON format,
 
 To use the library to retrieve configurations, create a `client/ConfigClient` and 
 invoke the method `GetConfiguration(applicationName string, profiles []string)`. The return will be the struct representation 
-of the configuration JSON - `model.Configuration`.
+of the configuration JSON - `client.Configuration`.
 
 ## Resources
 Spring's Config Server allows two ways to retrieve files from a backing repository.
