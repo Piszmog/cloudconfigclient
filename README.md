@@ -146,7 +146,7 @@ Spring's Config Server allows two ways to retrieve files from a backing reposito
 | URL Path | 
 | :---: |
 |`/<appName>/<profiles>/<directory>/<file>?useDefaultLabel=true`|
-|`/<appName>/<profiles>/<branch>/<directory>/<file>?useDefaultLabel=true`|
+|`/<appName>/<profiles>/<branch>/<directory>/<file>`|
 
 * When retrieving a file from the Config Server's default branch, the file must not exist at the root of the repository.
 
