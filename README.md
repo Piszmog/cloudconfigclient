@@ -150,7 +150,7 @@ Spring's Config Server allows two ways to retrieve files from a backing reposito
 
 * When retrieving a file from the Config Server's default branch, the file must not exist at the root of the repository.
 
-The functions available to retrieve resource files are, `GetFile(directory string, file string, interfaceType interface{}) error` and 
+The functions available to retrieve resource files are, `GetFile(directory string, file string, interfaceType interface{})` and 
 `GetFileFromBranch(branch string, directory string, file string, interfaceType interface{})`.
 
 * The `interfaceType` is the object to deserialize the file to
