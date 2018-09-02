@@ -1,7 +1,10 @@
 language: go
 
 go:
-- "1.10"
+- "1.11"
+
+env:
+- GO111MODULE=on
 
 notifications:
   email:
@@ -21,12 +24,8 @@ cache:
   - $GOPATH/bin
 
 before_install:
-- go get -u golang.org/x/vgo
 - go get golang.org/x/tools/cmd/cover
 - go get github.com/mattn/goveralls
-
-install:
-- vgo mod vendor
 
 script:
 - go test -v ./... -covermode=count -coverprofile=coverage.out
