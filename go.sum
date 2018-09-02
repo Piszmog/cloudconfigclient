@@ -1,5 +1,5 @@
-github.com/Piszmog/cfservices v1.3.0 h1:fYp2fe/CaYUI71gdcLMzs7XLy2VHb+NwdUonJOpMfac=
-github.com/Piszmog/cfservices v1.3.0/go.mod h1:uxLe5gKNnODE9Bt1aJd5WjaeTg8/Qr6Dibd1wFgfAwk=
+github.com/Piszmog/cfservices v1.3.1 h1:xiX4kjYJUxJYUBDgUJ+OgdqUsLX48yFq8YMZs/gdGyE=
+github.com/Piszmog/cfservices v1.3.1/go.mod h1:uxLe5gKNnODE9Bt1aJd5WjaeTg8/Qr6Dibd1wFgfAwk=
 github.com/golang/protobuf v1.1.0/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 golang.org/x/net v0.0.0-20180808004115-f9ce57c11b24 h1:mEsFm194MmS9vCwxFy+zwu0EU7ZkxxMD1iH++vmGdUY=
