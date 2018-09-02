@@ -41,7 +41,7 @@ func CreateCloudClientForService(name string) (*ConfigClient, error) {
 
 // GetCloudCredentials retrieves the Config Server's credentials so an OAuth2 client can be created.
 func GetCloudCredentials(name string) (*cfservices.ServiceCredentials, error) {
-	vcapServices := cfservices.LoadFromEnvironment()
+	vcapServices := cfservices.GetServices()
 	serviceCreds, err := cfservices.GetServiceCredentials(name, vcapServices)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to get credentials for the Config Server service %s", name)
