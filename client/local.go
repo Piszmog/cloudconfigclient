@@ -2,7 +2,7 @@ package client
 
 import (
 	"github.com/Piszmog/cfservices"
-	"github.com/Piszmog/cloudconfigclient/net"
+	"github.com/Piszmog/httpclient"
 	"github.com/pkg/errors"
 	"os"
 	"strings"
@@ -24,7 +24,7 @@ func CreateLocalClient() (*ConfigClient, error) {
 	configClients := make([]CloudClient, len(serviceCredentials.Credentials))
 	for index, cred := range serviceCredentials.Credentials {
 		configUri := cred.Uri
-		client := net.CreateDefaultHttpClient()
+		client := httpclient.CreateDefaultHttpClient()
 		configClients[index] = Client{configUri: configUri, httpClient: client}
 	}
 	return &ConfigClient{Clients: configClients}, nil
