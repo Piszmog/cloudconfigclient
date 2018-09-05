@@ -24,13 +24,14 @@ Below is an example usage of the library to retrieve a file from the Config Serv
 * For local config client, ensure `CONFIG_SERVER_URLS` is set
   * `CONFIG_SERVER_URLS` is a comma separated list of all the base URLs
 * For running in Cloud Foundry, ensure a Config Server is bounded to the application. `VCAP_SERVICES` will be provided as an environment variables with the credentials to access the Config Server
-  * If not running in Cloud Foundry but still want to connect to a Config Server via OAuth2, manually set the `VCAP_SERVICES` -- example value in `client/oauth2_test.go`
+* For connecting to a Config Server via OAuth2 and not deployed to Cloud Foundry, an OAuth2 Client can be created with `CreateOAuth2Client(credentials []cfservices.Credentials)`
 
 ```go
 package main
 
 import (
 	"fmt"
+	"github.com/Piszmog/cfservices"
 	"github.com/Piszmog/cloudconfigclient/client"
 )
 
@@ -47,6 +48,17 @@ func main() {
 	configClient, err := client.CreateLocalClient()
 	// or to create a Client for a Spring Config Server in Cloud Foundry
 	configClient, err := client.CreateCloudClient()
+	// or to create a Client for a Spring Config Server with OAuth2
+	credentials := cfservices.Credentials{
+		Uri:            "config server uri",
+		ClientSecret:   "client secret",
+		ClientId:       "client id",
+		AccessTokenUri: "access token uri",
+	}
+	creds := make([]cfservices.Credentials, 1)
+	creds[0] = credentials
+	configClient, err := client.CreateOAuth2Client(creds)
+	
 	if err != nil {
 		panic(err)
 	}
@@ -146,11 +158,11 @@ Spring's Config Server allows two ways to retrieve files from a backing reposito
 | URL Path | 
 | :---: |
 |`/<appName>/<profiles>/<directory>/<file>?useDefaultLabel=true`|
-|`/<appName>/<profiles>/<branch>/<directory>/<file>?useDefaultLabel=true`|
+|`/<appName>/<profiles>/<branch>/<directory>/<file>`|
 
 * When retrieving a file from the Config Server's default branch, the file must not exist at the root of the repository.
 
-The functions available to retrieve resource files are, `GetFile(directory string, file string, interfaceType interface{}) error` and 
+The functions available to retrieve resource files are, `GetFile(directory string, file string, interfaceType interface{})` and 
 `GetFileFromBranch(branch string, directory string, file string, interfaceType interface{})`.
 
 * The `interfaceType` is the object to deserialize the file to
