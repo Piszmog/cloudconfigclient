@@ -9,7 +9,7 @@ func TestCreateLocalClient(t *testing.T) {
 	const localURI = "http://localhost:8080"
 	os.Setenv(EnvironmentLocalConfigServerUrls, localURI)
 	defer os.Unsetenv(EnvironmentLocalConfigServerUrls)
-	configClient, err := CreateLocalClient()
+	configClient, err := CreateLocalClientFromEnv()
 	if err != nil {
 		t.Errorf("failed to create local client with error %v", err)
 	}
@@ -19,7 +19,7 @@ func TestCreateLocalClient(t *testing.T) {
 }
 
 func TestCreateLocalClientWhenENVNotSet(t *testing.T) {
-	configClient, err := CreateLocalClient()
+	configClient, err := CreateLocalClientFromEnv()
 	if err == nil {
 		t.Errorf("failed to create local client with error %v", err)
 	}
