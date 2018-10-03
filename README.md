@@ -33,7 +33,7 @@ package main
 import (
 	"fmt"
 	"github.com/Piszmog/cfservices"
-	"github.com/Piszmog/cloudconfigclient/client"
+	"github.com/Piszmog/cloudconfigclient"
 )
 
 type File struct {
@@ -46,11 +46,11 @@ type Example struct {
 
 func main() {
 	// To create a Client for a locally running Spring Config Server
-	configClient, err := client.CreateLocalClientFromEnv()
+	configClient, err := cloudconfigclient.CreateLocalClientFromEnv()
 	// Or
-	configClient, err := client.CreateLocalClient([]string{"http://localhost:8888"})
+	configClient, err := cloudconfigclient.CreateLocalClient([]string{"http://localhost:8888"})
 	// or to create a Client for a Spring Config Server in Cloud Foundry
-	configClient, err := client.CreateCloudClient()
+	configClient, err := cloudconfigclient.CreateCloudClient()
 	// or to create a Client for a Spring Config Server with OAuth2
 	credentials := cfservices.Credentials{
 		Uri:            "config server uri",
@@ -58,7 +58,7 @@ func main() {
 		ClientId:       "client id",
 		AccessTokenUri: "access token uri",
 	}
-	configClient, err := client.CreateOAuth2Client([]cfservices.Credentials{credentials})
+	configClient, err := cloudconfigclient.CreateOAuth2Client([]cfservices.Credentials{credentials})
 	
 	if err != nil {
 		panic(err)

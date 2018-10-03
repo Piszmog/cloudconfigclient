@@ -1,4 +1,4 @@
-package client
+package cloudconfigclient
 
 import (
 	"github.com/Piszmog/cfservices"
