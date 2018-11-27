@@ -1,5 +1,7 @@
 github.com/Piszmog/cfservices v1.3.1 h1:xiX4kjYJUxJYUBDgUJ+OgdqUsLX48yFq8YMZs/gdGyE=
 github.com/Piszmog/cfservices v1.3.1/go.mod h1:uxLe5gKNnODE9Bt1aJd5WjaeTg8/Qr6Dibd1wFgfAwk=
+github.com/Piszmog/cfservices v1.3.2 h1:QvAphVK6Mz/zN7ZWa13eiwqpGhe0mO1CO/usF3yA3UE=
+github.com/Piszmog/cfservices v1.3.2/go.mod h1:uxLe5gKNnODE9Bt1aJd5WjaeTg8/Qr6Dibd1wFgfAwk=
 github.com/Piszmog/httpclient v1.0.1 h1:LBgUxwb2zrwv/c1qx0D4lSwmz28ZNf7k91EsNbclJk0=
 github.com/Piszmog/httpclient v1.0.1/go.mod h1:FcqjAm4HhYGYfQaFY8kZ2Y+SGiO51s4H3K6GEtAHOn4=
 github.com/golang/protobuf v1.1.0/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=

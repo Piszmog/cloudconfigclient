@@ -1,7 +1,7 @@
 module github.com/Piszmog/cloudconfigclient
 
 require (
-	github.com/Piszmog/cfservices v1.3.1
+	github.com/Piszmog/cfservices v1.3.2
 	github.com/Piszmog/httpclient v1.0.1
 	github.com/golang/protobuf v1.1.0 // indirect
 	github.com/pkg/errors v0.8.0
