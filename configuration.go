@@ -38,7 +38,7 @@ func (configClient ConfigClient) GetConfiguration(applicationName string, profil
 			continue
 		}
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to retrieve application configurations")
+			return nil, errors.Wrap(err, "failed to retrieve application configurations")
 		}
 		if resp.StatusCode != 200 {
 			return nil, errors.Errorf("server responded with status code %d", resp.StatusCode)
@@ -48,7 +48,7 @@ func (configClient ConfigClient) GetConfiguration(applicationName string, profil
 		err = decoder.Decode(configuration)
 		resp.Body.Close()
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to decode response from url")
+			return nil, errors.Wrap(err, "failed to decode response from url")
 		}
 		return configuration, nil
 	}

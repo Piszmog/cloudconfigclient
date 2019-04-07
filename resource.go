@@ -27,7 +27,7 @@ func (configClient ConfigClient) GetFile(directory string, file string, interfac
 			continue
 		}
 		if err != nil {
-			return errors.Wrapf(err, "failed to retrieve file")
+			return errors.Wrap(err, "failed to retrieve file")
 		}
 		if resp.StatusCode != 200 {
 			return errors.Errorf("server responded with status code %d", resp.StatusCode)
