@@ -1,7 +1,7 @@
 package cloudconfigclient
 
 import (
-	"github.com/pkg/errors"
+	"errors"
 	"testing"
 )
 
