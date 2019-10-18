@@ -1,9 +1,9 @@
 package cloudconfigclient
 
 import (
+	"fmt"
 	"github.com/Piszmog/cfservices"
 	"github.com/Piszmog/cloudconfigclient/net"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -25,19 +25,19 @@ func CreateCloudClient() (*ConfigClient, error) {
 func CreateCloudClientForService(name string) (*ConfigClient, error) {
 	serviceCredentials, err := GetCloudCredentials(name)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create cloud client")
+		return nil, fmt.Errorf("failed to create cloud client: %w", err)
 	}
 	return CreateOAuth2Client(serviceCredentials.Credentials)
 }
 
 // CreateOAuth2Client creates a ConfigClient to access Config Servers from an array of credentials.
 func CreateOAuth2Client(credentials []cfservices.Credentials) (*ConfigClient, error) {
-	configClients := make([]CloudClient, len(credentials))
+	configClients := make([]CloudClient, len(credentials), len(credentials))
 	for index, cred := range credentials {
 		configUri := cred.Uri
 		client, err := net.CreateOAuth2Client(&cred)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to create oauth2 client for %s", configUri)
+			return nil, fmt.Errorf("failed to create oauth2 client for %s: %w", configUri, err)
 		}
 		configClients[index] = Client{configUri: configUri, httpClient: client}
 	}
@@ -48,7 +48,7 @@ func CreateOAuth2Client(credentials []cfservices.Credentials) (*ConfigClient, er
 func GetCloudCredentials(name string) (*cfservices.ServiceCredentials, error) {
 	serviceCreds, err := cfservices.GetServiceCredentialsFromEnvironment(name)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to get credentials for the Config Server service %s", name)
+		return nil, fmt.Errorf("failed to get credentials for the Config Server service %s: %w", name, err)
 	}
 	return serviceCreds, nil
 }

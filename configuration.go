@@ -1,9 +1,9 @@
 package cloudconfigclient
 
 import (
-	"encoding/json"
+	"errors"
+	"fmt"
 	"github.com/Piszmog/cloudconfigclient/net"
-	"github.com/pkg/errors"
 )
 
 // Source is the application's source configurations. It con contain zero to n number of property sources.
@@ -31,26 +31,17 @@ type Configuration interface {
 
 // GetConfiguration retrieves the configurations/property sources of an application based on the name of the application
 // and the profiles of the application.
-func (configClient ConfigClient) GetConfiguration(applicationName string, profiles []string) (*Source, error) {
-	for _, client := range configClient.Clients {
-		resp, err := client.Get(applicationName, net.JoinProfiles(profiles))
-		if resp != nil && resp.StatusCode == 404 {
-			continue
+func (c ConfigClient) GetConfiguration(applicationName string, profiles []string) (Source, error) {
+	var source Source
+	for _, client := range c.Clients {
+		if err := getResource(client, &source, applicationName, net.JoinProfiles(profiles)); err != nil {
+			var notFoundError *NotFoundError
+			if errors.As(err, &notFoundError) {
+				continue
+			}
+			return Source{}, err
 		}
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to retrieve application configurations")
-		}
-		if resp.StatusCode != 200 {
-			return nil, errors.Errorf("server responded with status code %d", resp.StatusCode)
-		}
-		configuration := &Source{}
-		decoder := json.NewDecoder(resp.Body)
-		err = decoder.Decode(configuration)
-		resp.Body.Close()
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to decode response from url")
-		}
-		return configuration, nil
+		return source, nil
 	}
-	return nil, errors.Errorf("failed to find configuration for application %s with profiles %s", applicationName, profiles)
+	return Source{}, fmt.Errorf("failed to find configuration for application %s with profiles %s", applicationName, profiles)
 }

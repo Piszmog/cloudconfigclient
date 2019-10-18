@@ -1,8 +1,9 @@
 package net
 
 import (
+	"errors"
+	"fmt"
 	"github.com/Piszmog/cfservices"
-	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2/clientcredentials"
 	"net/http"
@@ -12,7 +13,7 @@ import (
 func CreateOAuth2Client(cred *cfservices.Credentials) (*http.Client, error) {
 	config, err := CreateOAuth2Config(cred)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create oauth2 config")
+		return nil, fmt.Errorf("failed to create oauth2 config: %w", err)
 	}
 	return config.Client(context.Background()), nil
 }
