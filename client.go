@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/Piszmog/cloudconfigclient/net"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -45,17 +46,20 @@ func (client Client) Get(uriVariables ...string) (resp *http.Response, err error
 func getResource(client CloudClient, dest interface{}, uriVariables ...string) error {
 	resp, err := client.Get(uriVariables...)
 	if err != nil {
-		return fmt.Errorf("failed to retrieve application configurations: %w", err)
+		return err
 	}
-	defer resp.Body.Close()
+	defer closeResource(resp.Body)
 	if resp.StatusCode == 404 {
 		return &NotFoundError{}
 	}
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("server responded with status code %d", resp.StatusCode)
+		b, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return fmt.Errorf("failed to read body with status code %d: %w", resp.StatusCode, err)
+		}
+		return fmt.Errorf("server responded with status code %d and body %s", resp.StatusCode, b)
 	}
-	decoder := json.NewDecoder(resp.Body)
-	if err := decoder.Decode(dest); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(dest); err != nil {
 		return fmt.Errorf("failed to decode response from url: %w", err)
 	}
 	return nil

@@ -3,7 +3,7 @@ package cloudconfigclient
 import (
 	"fmt"
 	"github.com/Piszmog/cfservices"
-	"github.com/Piszmog/httpclient"
+	"net/http"
 	"os"
 	"strings"
 )
@@ -17,7 +17,7 @@ const (
 // environment variable 'CONFIG_SERVER_URLS'.
 //
 // The ConfigClient's underlying http.Client is configured with timeouts and connection pools.
-func CreateLocalClientFromEnv() (*ConfigClient, error) {
+func CreateLocalClientFromEnv(client *http.Client) (*ConfigClient, error) {
 	serviceCredentials, err := GetLocalCredentials()
 	if err != nil {
 		return nil, fmt.Errorf("failed to create a local client: %w", err)
@@ -26,17 +26,16 @@ func CreateLocalClientFromEnv() (*ConfigClient, error) {
 	for index, cred := range serviceCredentials.Credentials {
 		baseUrls[index] = cred.Uri
 	}
-	return CreateLocalClient(baseUrls)
+	return CreateLocalClient(client, baseUrls)
 }
 
 // CreateLocalClient creates a ConfigClient for a locally running Config Server.
 //
 // The ConfigClient's underlying http.Client is configured with timeouts and connection pools.
-func CreateLocalClient(baseUrls []string) (*ConfigClient, error) {
+func CreateLocalClient(client *http.Client, baseUrls []string) (*ConfigClient, error) {
 	configClients := make([]CloudClient, len(baseUrls), len(baseUrls))
 	for index, baseUrl := range baseUrls {
 		configUri := baseUrl
-		client := httpclient.CreateDefaultHttpClient()
 		configClients[index] = Client{configUri: configUri, httpClient: client}
 	}
 	return &ConfigClient{Clients: configClients}, nil
@@ -53,9 +52,7 @@ func GetLocalCredentials() (*cfservices.ServiceCredentials, error) {
 	urls := strings.Split(localUrls, ",")
 	creds := make([]cfservices.Credentials, len(urls), len(urls))
 	for index, url := range urls {
-		creds[index] = cfservices.Credentials{
-			Uri: url,
-		}
+		creds[index] = cfservices.Credentials{Uri: url}
 	}
 	return &cfservices.ServiceCredentials{Credentials: creds}, nil
 }

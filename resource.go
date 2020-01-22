@@ -8,6 +8,7 @@ import (
 const (
 	defaultApplicationName    = "default"
 	defaultApplicationProfile = "default"
+	useDefaultLabel           = "useDefaultLabel=true"
 )
 
 // Resource interface describes how to retrieve files from the Config Server.
@@ -22,7 +23,7 @@ type Resource interface {
 func (c ConfigClient) GetFile(directory string, file string, interfaceType interface{}) error {
 	fileFound := false
 	for _, client := range c.Clients {
-		if err := getResource(client, interfaceType, defaultApplicationName, defaultApplicationProfile, directory, file+"?useDefaultLabel=true"); err != nil {
+		if err := getResource(client, interfaceType, defaultApplicationName, defaultApplicationProfile, directory, file+"?"+useDefaultLabel); err != nil {
 			var notFoundError *NotFoundError
 			if errors.As(err, &notFoundError) {
 				continue
