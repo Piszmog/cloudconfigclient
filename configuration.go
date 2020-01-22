@@ -6,6 +6,8 @@ import (
 	"github.com/Piszmog/cloudconfigclient/net"
 )
 
+var notFoundError *NotFoundError
+
 // Source is the application's source configurations. It con contain zero to n number of property sources.
 type Source struct {
 	Name            string           `json:"name"`
@@ -35,7 +37,6 @@ func (c ConfigClient) GetConfiguration(applicationName string, profiles []string
 	var source Source
 	for _, client := range c.Clients {
 		if err := getResource(client, &source, applicationName, net.JoinProfiles(profiles)); err != nil {
-			var notFoundError *NotFoundError
 			if errors.As(err, &notFoundError) {
 				continue
 			}

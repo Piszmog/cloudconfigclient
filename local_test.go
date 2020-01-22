@@ -1,15 +1,23 @@
 package cloudconfigclient
 
 import (
+	"fmt"
+	"net/http"
 	"os"
 	"testing"
 )
 
 func TestCreateLocalClient(t *testing.T) {
 	const localURI = "http://localhost:8080"
-	os.Setenv(EnvironmentLocalConfigServerUrls, localURI)
-	defer os.Unsetenv(EnvironmentLocalConfigServerUrls)
-	configClient, err := CreateLocalClientFromEnv()
+	if err := os.Setenv(EnvironmentLocalConfigServerUrls, localURI); err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		if err := os.Unsetenv(EnvironmentLocalConfigServerUrls); err != nil {
+			fmt.Println(err)
+		}
+	}()
+	configClient, err := CreateLocalClientFromEnv(&http.Client{})
 	if err != nil {
 		t.Errorf("failed to create local client with error %v", err)
 	}
@@ -19,7 +27,7 @@ func TestCreateLocalClient(t *testing.T) {
 }
 
 func TestCreateLocalClientWhenENVNotSet(t *testing.T) {
-	configClient, err := CreateLocalClientFromEnv()
+	configClient, err := CreateLocalClientFromEnv(&http.Client{})
 	if err == nil {
 		t.Errorf("failed to create local client with error %v", err)
 	}
@@ -30,8 +38,14 @@ func TestCreateLocalClientWhenENVNotSet(t *testing.T) {
 
 func TestGetLocalCredentials(t *testing.T) {
 	const localURI = "http://localhost:8080"
-	os.Setenv(EnvironmentLocalConfigServerUrls, localURI)
-	defer os.Unsetenv(EnvironmentLocalConfigServerUrls)
+	if err := os.Setenv(EnvironmentLocalConfigServerUrls, localURI); err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		if err := os.Unsetenv(EnvironmentLocalConfigServerUrls); err != nil {
+			fmt.Println(err)
+		}
+	}()
 	serviceCredentials, err := GetLocalCredentials()
 	if err != nil {
 		t.Errorf("failed to get local credentials with error %v", err)

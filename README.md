@@ -34,6 +34,7 @@ import (
 	"fmt"
 	"github.com/Piszmog/cfservices"
 	"github.com/Piszmog/cloudconfigclient"
+	"net/http"
 )
 
 type File struct {
@@ -46,9 +47,9 @@ type Example struct {
 
 func main() {
 	// To create a Client for a locally running Spring Config Server
-	configClient, err := cloudconfigclient.CreateLocalClientFromEnv()
+	configClient, err := cloudconfigclient.CreateLocalClientFromEnv(&http.Client{})
 	// Or
-	configClient, err := cloudconfigclient.CreateLocalClient([]string{"http://localhost:8888"})
+	configClient, err := cloudconfigclient.CreateLocalClient(&http.Client{}, []string{"http://localhost:8888"})
 	// or to create a Client for a Spring Config Server in Cloud Foundry
 	configClient, err := cloudconfigclient.CreateCloudClient()
 	// or to create a Client for a Spring Config Server with OAuth2
