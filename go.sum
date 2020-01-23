@@ -1,6 +1,8 @@
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 github.com/Piszmog/cfservices v1.3.6 h1:hFt4MQwRVXzMXKcuMiGbUb56j+ns4wwsCVckSy1POAU=
 github.com/Piszmog/cfservices v1.3.6/go.mod h1:kqqfwtk5qUXqg/axf+8eECqFE3n06S/+9qWNPasF0v4=
+github.com/Piszmog/cfservices v1.3.7 h1:497R3kKjuYhkwoSyYTTY12wHl8jdubR26hTpCpgE93w=
+github.com/Piszmog/cfservices v1.3.7/go.mod h1:kqqfwtk5qUXqg/axf+8eECqFE3n06S/+9qWNPasF0v4=
 github.com/golang/protobuf v1.2.0 h1:P3YflyNX/ehuJFLhxviNdFxQPkGK5cDcApsge1SqnvM=
 github.com/golang/protobuf v1.2.0/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
 github.com/golang/protobuf v1.3.1/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
