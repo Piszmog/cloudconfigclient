@@ -7,6 +7,8 @@
 
 Go library for Spring Config Server. Inspired by the Java library [Cloud Config Client](https://github.com/Piszmog/cloud-config-client)
 
+`go get github.com/Piszmog/cloudconfigclient`
+
 ## Description
 Spring's Config Server provides way to externalize configurations of applications. Spring's
 [Spring Cloud Config Client](https://github.com/spring-cloud/spring-cloud-config/tree/master/spring-cloud-config-client)
