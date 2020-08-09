@@ -7,10 +7,10 @@ GO_TEST=$(GO_CMD) test
 # Commands
 all: clean vet test build
 clean:
-    $(GO_CLEAN)
+	$(GO_CLEAN)
 vet:
-    $(GO_CMD) vet
+	$(GO_CMD) vet
 test:
-    $(GO_TEST) -v ./...
+	$(GO_TEST) -v ./...
 build:
-    $(GO_BUILD)
+	$(GO_BUILD)
