@@ -3,7 +3,7 @@ package cloudconfigclient
 import (
 	"errors"
 	"fmt"
-	"github.com/Piszmog/cloudconfigclient/net"
+	"strings"
 )
 
 var notFoundError *NotFoundError
@@ -36,7 +36,7 @@ type Configuration interface {
 func (c ConfigClient) GetConfiguration(applicationName string, profiles []string) (Source, error) {
 	var source Source
 	for _, client := range c.Clients {
-		if err := getResource(client, &source, applicationName, net.JoinProfiles(profiles)); err != nil {
+		if err := getResource(client, &source, applicationName, joinProfiles(profiles)); err != nil {
 			if errors.As(err, &notFoundError) {
 				continue
 			}
@@ -45,4 +45,8 @@ func (c ConfigClient) GetConfiguration(applicationName string, profiles []string
 		return source, nil
 	}
 	return Source{}, fmt.Errorf("failed to find configuration for application %s with profiles %s", applicationName, profiles)
+}
+
+func joinProfiles(profiles []string) string {
+	return strings.Join(profiles, ",")
 }

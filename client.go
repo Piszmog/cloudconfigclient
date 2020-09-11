@@ -3,9 +3,10 @@ package cloudconfigclient
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/Piszmog/cloudconfigclient/net"
 	"io/ioutil"
 	"net/http"
+	"net/url"
+	"path"
 )
 
 // NotFoundError is a special error that is used to propagate 404s.
@@ -24,7 +25,7 @@ type ConfigClient struct {
 
 // CloudClient interacts with the Config Server's REST APIs
 type CloudClient interface {
-	Get(uriVariables ...string) (resp *http.Response, err error)
+	Get(uriVariables ...string) (*http.Response, error)
 }
 
 // Client that wraps http.Client and the base Uri of the http client
@@ -34,13 +35,27 @@ type Client struct {
 }
 
 // Get performs a REST GET
-func (client Client) Get(uriVariables ...string) (resp *http.Response, err error) {
-	fullUrl := net.CreateUrl(client.configUri, uriVariables...)
+func (client Client) Get(uriVariables ...string) (*http.Response, error) {
+	fullUrl, err := createUrl(client.configUri, uriVariables...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create url: %w", err)
+	}
 	response, err := client.httpClient.Get(fullUrl)
 	if err != nil {
 		return nil, fmt.Errorf("failed to retrieve from %s: %w", fullUrl, err)
 	}
 	return response, nil
+}
+
+func createUrl(baseUrl string, uriVariables ...string) (string, error) {
+	parseUrl, err := url.Parse(baseUrl)
+	if err != nil {
+		return "", fmt.Errorf("failed to parse url %s: %w", baseUrl, err)
+	}
+	for _, variable := range uriVariables {
+		parseUrl.Path = path.Join(parseUrl.Path, variable)
+	}
+	return parseUrl.String(), nil
 }
 
 func getResource(client CloudClient, dest interface{}, uriVariables ...string) error {

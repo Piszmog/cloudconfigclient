@@ -1,9 +1,12 @@
 package cloudconfigclient
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"github.com/Piszmog/cfservices"
-	"github.com/Piszmog/cloudconfigclient/net"
+	"golang.org/x/oauth2/clientcredentials"
+	"net/http"
 )
 
 const (
@@ -35,13 +38,34 @@ func CreateOAuth2Client(credentials []cfservices.Credentials) (*ConfigClient, er
 	configClients := make([]CloudClient, len(credentials), len(credentials))
 	for index, cred := range credentials {
 		configUri := cred.Uri
-		client, err := net.CreateOAuth2Client(&cred)
+		client, err := CreateOAuth2HTTPClient(&cred)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create oauth2 client for %s: %w", configUri, err)
 		}
 		configClients[index] = Client{configUri: configUri, httpClient: client}
 	}
 	return &ConfigClient{Clients: configClients}, nil
+}
+
+// CreateOAuth2HTTPClient creates an OAuth2 http.Client from the provided credentials.
+func CreateOAuth2HTTPClient(cred *cfservices.Credentials) (*http.Client, error) {
+	config, err := CreateOAuth2Config(cred)
+	if err != nil {
+		return nil, err
+	}
+	return config.Client(context.Background()), nil
+}
+
+// CreateOAuth2Config creates an OAuth2 config from the provided credentials.
+func CreateOAuth2Config(cred *cfservices.Credentials) (*clientcredentials.Config, error) {
+	if cred == nil {
+		return nil, errors.New("no credentials provided")
+	}
+	return &clientcredentials.Config{
+		ClientID:     cred.ClientId,
+		ClientSecret: cred.ClientSecret,
+		TokenURL:     cred.AccessTokenUri,
+	}, nil
 }
 
 // GetCloudCredentials retrieves the Config Server's credentials so an OAuth2 client can be created.
