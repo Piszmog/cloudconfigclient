@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestCreateLocalClient(t *testing.T) {
+func TestNewLocalClient(t *testing.T) {
 	const localURI = "http://localhost:8080"
 	err := os.Setenv(cloudconfigclient.EnvironmentLocalConfigServerUrls, localURI)
 	assert.NoError(t, err)
@@ -18,7 +18,7 @@ func TestCreateLocalClient(t *testing.T) {
 	assert.NotNil(t, configClient)
 }
 
-func TestCreateLocalClientWhenENVNotSet(t *testing.T) {
+func TestNewLocalClientWhenENVNotSet(t *testing.T) {
 	configClient, err := cloudconfigclient.NewLocalClientFromEnv(&http.Client{})
 	assert.Error(t, err)
 	assert.Nil(t, configClient)

@@ -34,17 +34,17 @@ const (
 }`
 )
 
-func TestCreateCloudClient(t *testing.T) {
+func TestNewCloudClient(t *testing.T) {
 	err := os.Setenv(cfservices.VCAPServices, vcapServices)
 	assert.NoError(t, err)
 	defer os.Unsetenv(cfservices.VCAPServices)
-	configClient, err := cloudconfigclient.CreateCloudClient()
+	configClient, err := cloudconfigclient.NewCloudClient()
 	assert.NoError(t, err)
 	assert.NotNil(t, configClient)
 }
 
-func TestCreateCloudClientWhenENVNotSet(t *testing.T) {
-	configClient, err := cloudconfigclient.CreateCloudClient()
+func TestNewCloudClientWhenENVNotSet(t *testing.T) {
+	configClient, err := cloudconfigclient.NewCloudClient()
 	assert.Error(t, err)
 	assert.Nil(t, configClient)
 }
@@ -64,36 +64,36 @@ func TestGetCloudCredentialsWhenENVNotSet(t *testing.T) {
 	assert.Nil(t, serviceCredentials)
 }
 
-func TestCreateOAuth2Client(t *testing.T) {
+func TestNewOAuth2Client(t *testing.T) {
 	credentials := &cfservices.Credentials{
 		AccessTokenUri: "tokenUri",
 		ClientSecret:   "clientSecret",
 		ClientId:       "clientId",
 	}
-	client, err := cloudconfigclient.CreateOAuth2HTTPClient(credentials)
+	client, err := cloudconfigclient.NewOAuth2HTTPClient(credentials)
 	assert.NoError(t, err)
 	assert.NotNil(t, client)
 }
 
-func TestCreateOAuth2ClientWhenCredentialsAreNil(t *testing.T) {
-	client, err := cloudconfigclient.CreateOAuth2HTTPClient(nil)
+func TestNewOAuth2ClientWhenCredentialsAreNil(t *testing.T) {
+	client, err := cloudconfigclient.NewOAuth2HTTPClient(nil)
 	assert.Error(t, err)
 	assert.Nil(t, client)
 }
 
-func TestCreateOauth2Config(t *testing.T) {
+func TestNewOAuth2Config(t *testing.T) {
 	credentials := &cfservices.Credentials{
 		AccessTokenUri: "tokenUri",
 		ClientSecret:   "clientSecret",
 		ClientId:       "clientId",
 	}
-	config, err := cloudconfigclient.CreateOAuth2HTTPClient(credentials)
+	config, err := cloudconfigclient.NewOAuth2HTTPClient(credentials)
 	assert.NoError(t, err)
 	assert.NotNil(t, config)
 }
 
-func TestCreateOauth2ConfigWhenCredentialsNil(t *testing.T) {
-	config, err := cloudconfigclient.CreateOAuth2HTTPClient(nil)
+func TestNewOAuth2ConfigWhenCredentialsNil(t *testing.T) {
+	config, err := cloudconfigclient.NewOAuth2HTTPClient(nil)
 	assert.Error(t, err)
 	assert.Nil(t, config)
 }
