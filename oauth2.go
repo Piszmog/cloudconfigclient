@@ -10,7 +10,8 @@ import (
 )
 
 const (
-	defaultConfigServerName = "p-config-server"
+	// DefaultConfigServerName the default name of the config server in PCF
+	DefaultConfigServerName = "p-config-server"
 )
 
 // CreateCloudClient creates a ConfigClient to access Config Servers running in the cloud (specifically Cloud Foundry).
@@ -18,7 +19,7 @@ const (
 // The environment variables 'VCAP_SERVICES' provides a JSON that contains an entry with the key 'p-config-server'. This
 // entry and used to build an OAuth2 client.
 func CreateCloudClient() (*ConfigClient, error) {
-	return CreateCloudClientForService(defaultConfigServerName)
+	return CreateCloudClientForService(DefaultConfigServerName)
 }
 
 // CreateCloudClientForService creates a ConfigClient to access Config Servers running in the cloud (specifically Cloud Foundry).

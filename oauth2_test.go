@@ -3,6 +3,7 @@ package cloudconfigclient_test
 import (
 	"github.com/Piszmog/cfservices"
 	"github.com/Piszmog/cloudconfigclient"
+	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
 )
@@ -34,47 +35,33 @@ const (
 )
 
 func TestCreateCloudClient(t *testing.T) {
-	os.Setenv(cfservices.VCAPServices, vcapServices)
+	err := os.Setenv(cfservices.VCAPServices, vcapServices)
+	assert.NoError(t, err)
 	defer os.Unsetenv(cfservices.VCAPServices)
 	configClient, err := cloudconfigclient.CreateCloudClient()
-	if err != nil {
-		t.Errorf("failed to create cloud client with error %v", err)
-	}
-	if configClient == nil {
-		t.Error("failed to create cloud client")
-	}
+	assert.NoError(t, err)
+	assert.NotNil(t, configClient)
 }
 
 func TestCreateCloudClientWhenENVNotSet(t *testing.T) {
 	configClient, err := cloudconfigclient.CreateCloudClient()
-	if err == nil {
-		t.Error("expected error when env is not set")
-	}
-	if configClient != nil {
-		t.Error("created cloud client when env is not set")
-	}
+	assert.Error(t, err)
+	assert.Nil(t, configClient)
 }
 
 func TestGetCloudCredentials(t *testing.T) {
-	os.Setenv(cfservices.VCAPServices, vcapServices)
+	err := os.Setenv(cfservices.VCAPServices, vcapServices)
+	assert.NoError(t, err)
 	defer os.Unsetenv(cfservices.VCAPServices)
-	serviceCredentials, err := cloudconfigclient.GetCloudCredentials(defaultConfigServerName)
-	if err != nil {
-		t.Errorf("failed to create cloud credentials with error %v", err)
-	}
-	if serviceCredentials == nil {
-		t.Error("failed to create cloud credentials")
-	}
+	serviceCredentials, err := cloudconfigclient.GetCloudCredentials(cloudconfigclient.DefaultConfigServerName)
+	assert.NoError(t, err)
+	assert.NotNil(t, serviceCredentials)
 }
 
 func TestGetCloudCredentialsWhenENVNotSet(t *testing.T) {
-	serviceCredentials, err := cloudconfigclient.GetCloudCredentials(defaultConfigServerName)
-	if err == nil {
-		t.Error("expected error when env is not set")
-	}
-	if serviceCredentials != nil {
-		t.Error("created cloud credentials when env is not set")
-	}
+	serviceCredentials, err := cloudconfigclient.GetCloudCredentials(cloudconfigclient.DefaultConfigServerName)
+	assert.Error(t, err)
+	assert.Nil(t, serviceCredentials)
 }
 
 func TestCreateOAuth2Client(t *testing.T) {
@@ -84,22 +71,14 @@ func TestCreateOAuth2Client(t *testing.T) {
 		ClientId:       "clientId",
 	}
 	client, err := cloudconfigclient.CreateOAuth2HTTPClient(credentials)
-	if err != nil {
-		t.Errorf("failed to create oauth2 client with error %v", err)
-	}
-	if client == nil {
-		t.Error("no oauth2 client returned")
-	}
+	assert.NoError(t, err)
+	assert.NotNil(t, client)
 }
 
 func TestCreateOAuth2ClientWhenCredentialsAreNil(t *testing.T) {
 	client, err := cloudconfigclient.CreateOAuth2HTTPClient(nil)
-	if err == nil {
-		t.Error("expected an error when no credentials are passed")
-	}
-	if client != nil {
-		t.Error("able to create an oauth2 client with nil credentials")
-	}
+	assert.Error(t, err)
+	assert.Nil(t, client)
 }
 
 func TestCreateOauth2Config(t *testing.T) {
@@ -109,20 +88,12 @@ func TestCreateOauth2Config(t *testing.T) {
 		ClientId:       "clientId",
 	}
 	config, err := cloudconfigclient.CreateOAuth2HTTPClient(credentials)
-	if err != nil {
-		t.Errorf("failed to create oauth2 with errpr %v", err)
-	}
-	if config == nil {
-		t.Error("failed to create oauth2 config")
-	}
+	assert.NoError(t, err)
+	assert.NotNil(t, config)
 }
 
 func TestCreateOauth2ConfigWhenCredentialsNil(t *testing.T) {
 	config, err := cloudconfigclient.CreateOAuth2HTTPClient(nil)
-	if err == nil {
-		t.Error("expected an error when passing nil credentials when creating oauth2 config")
-	}
-	if config != nil {
-		t.Error("is able to create oauth2 config when credentials are nil")
-	}
+	assert.Error(t, err)
+	assert.Nil(t, config)
 }

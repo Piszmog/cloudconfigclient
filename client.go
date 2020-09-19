@@ -9,15 +9,6 @@ import (
 	"path"
 )
 
-// NotFoundError is a special error that is used to propagate 404s.
-type NotFoundError struct {
-}
-
-// Error return the error message.
-func (r NotFoundError) Error() string {
-	return "failed to find resource"
-}
-
 // ConfigClient contains the clients of the Config Servers.
 type ConfigClient struct {
 	// Clients are all the config server clients
@@ -68,7 +59,7 @@ func getResource(client CloudClient, dest interface{}, uriVariables ...string) e
 	}
 	defer closeResource(resp.Body)
 	if resp.StatusCode == 404 {
-		return &NotFoundError{}
+		return notFoundError
 	}
 	if resp.StatusCode != 200 {
 		b, err := ioutil.ReadAll(resp.Body)

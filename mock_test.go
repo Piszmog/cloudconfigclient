@@ -2,6 +2,7 @@ package cloudconfigclient_test
 
 import (
 	"bytes"
+	"github.com/Piszmog/cloudconfigclient"
 	"github.com/stretchr/testify/mock"
 	"io/ioutil"
 	"net/http"
@@ -39,4 +40,9 @@ func NewMockHttpResponse(code int, body string) *http.Response {
 		// Must be set to non-nil value or it panics
 		Header: make(http.Header),
 	}
+}
+
+// NewConfigClient creates a new config client
+func NewConfigClient(clients ...cloudconfigclient.CloudClient) cloudconfigclient.ConfigClient {
+	return cloudconfigclient.ConfigClient{Clients: clients}
 }
