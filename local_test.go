@@ -1,7 +1,8 @@
-package cloudconfigclient
+package cloudconfigclient_test
 
 import (
 	"fmt"
+	"github.com/Piszmog/cloudconfigclient"
 	"net/http"
 	"os"
 	"testing"
@@ -9,15 +10,15 @@ import (
 
 func TestCreateLocalClient(t *testing.T) {
 	const localURI = "http://localhost:8080"
-	if err := os.Setenv(EnvironmentLocalConfigServerUrls, localURI); err != nil {
+	if err := os.Setenv(cloudconfigclient.EnvironmentLocalConfigServerUrls, localURI); err != nil {
 		t.Fatal(err)
 	}
 	defer func() {
-		if err := os.Unsetenv(EnvironmentLocalConfigServerUrls); err != nil {
+		if err := os.Unsetenv(cloudconfigclient.EnvironmentLocalConfigServerUrls); err != nil {
 			fmt.Println(err)
 		}
 	}()
-	configClient, err := CreateLocalClientFromEnv(&http.Client{})
+	configClient, err := cloudconfigclient.NewLocalClientFromEnv(&http.Client{})
 	if err != nil {
 		t.Errorf("failed to create local client with error %v", err)
 	}
@@ -27,7 +28,7 @@ func TestCreateLocalClient(t *testing.T) {
 }
 
 func TestCreateLocalClientWhenENVNotSet(t *testing.T) {
-	configClient, err := CreateLocalClientFromEnv(&http.Client{})
+	configClient, err := cloudconfigclient.NewLocalClientFromEnv(&http.Client{})
 	if err == nil {
 		t.Errorf("failed to create local client with error %v", err)
 	}
@@ -38,15 +39,15 @@ func TestCreateLocalClientWhenENVNotSet(t *testing.T) {
 
 func TestGetLocalCredentials(t *testing.T) {
 	const localURI = "http://localhost:8080"
-	if err := os.Setenv(EnvironmentLocalConfigServerUrls, localURI); err != nil {
+	if err := os.Setenv(cloudconfigclient.EnvironmentLocalConfigServerUrls, localURI); err != nil {
 		t.Fatal(err)
 	}
 	defer func() {
-		if err := os.Unsetenv(EnvironmentLocalConfigServerUrls); err != nil {
+		if err := os.Unsetenv(cloudconfigclient.EnvironmentLocalConfigServerUrls); err != nil {
 			fmt.Println(err)
 		}
 	}()
-	serviceCredentials, err := GetLocalCredentials()
+	serviceCredentials, err := cloudconfigclient.GetLocalCredentials()
 	if err != nil {
 		t.Errorf("failed to get local credentials with error %v", err)
 	}
@@ -59,7 +60,7 @@ func TestGetLocalCredentials(t *testing.T) {
 }
 
 func TestGetLocalCredentialsWhenEnvNotSet(t *testing.T) {
-	serviceCredentials, err := GetLocalCredentials()
+	serviceCredentials, err := cloudconfigclient.GetLocalCredentials()
 	if err == nil {
 		t.Errorf("expected an error when creating credentials")
 	}

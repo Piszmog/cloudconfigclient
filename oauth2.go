@@ -42,7 +42,7 @@ func CreateOAuth2Client(credentials []cfservices.Credentials) (*ConfigClient, er
 		if err != nil {
 			return nil, fmt.Errorf("failed to create oauth2 client for %s: %w", configUri, err)
 		}
-		configClients[index] = Client{configUri: configUri, httpClient: client}
+		configClients[index] = Client{ConfigUri: configUri, HttpClient: client}
 	}
 	return &ConfigClient{Clients: configClients}, nil
 }

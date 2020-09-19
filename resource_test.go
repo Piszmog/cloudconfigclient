@@ -1,4 +1,4 @@
-package cloudconfigclient
+package cloudconfigclient_test
 
 import (
 	"errors"

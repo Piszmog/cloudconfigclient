@@ -13,11 +13,11 @@ const (
 	EnvironmentLocalConfigServerUrls = "CONFIG_SERVER_URLS"
 )
 
-// CreateLocalClientFromEnv creates a ConfigClient for a locally running Config Server. Acquires the base URLs from the
+// NewLocalClientFromEnv creates a ConfigClient for a locally running Config Server. Acquires the base URLs from the
 // environment variable 'CONFIG_SERVER_URLS'.
 //
 // The ConfigClient's underlying http.Client is configured with timeouts and connection pools.
-func CreateLocalClientFromEnv(client *http.Client) (*ConfigClient, error) {
+func NewLocalClientFromEnv(client *http.Client) (*ConfigClient, error) {
 	serviceCredentials, err := GetLocalCredentials()
 	if err != nil {
 		return nil, fmt.Errorf("failed to create a local client: %w", err)
@@ -26,17 +26,17 @@ func CreateLocalClientFromEnv(client *http.Client) (*ConfigClient, error) {
 	for index, cred := range serviceCredentials.Credentials {
 		baseUrls[index] = cred.Uri
 	}
-	return CreateLocalClient(client, baseUrls)
+	return NewLocalClient(client, baseUrls)
 }
 
-// CreateLocalClient creates a ConfigClient for a locally running Config Server.
+// NewLocalClient creates a ConfigClient for a locally running Config Server.
 //
 // The ConfigClient's underlying http.Client is configured with timeouts and connection pools.
-func CreateLocalClient(client *http.Client, baseUrls []string) (*ConfigClient, error) {
+func NewLocalClient(client *http.Client, baseUrls []string) (*ConfigClient, error) {
 	configClients := make([]CloudClient, len(baseUrls), len(baseUrls))
 	for index, baseUrl := range baseUrls {
 		configUri := baseUrl
-		configClients[index] = Client{configUri: configUri, httpClient: client}
+		configClients[index] = Client{ConfigUri: configUri, HttpClient: client}
 	}
 	return &ConfigClient{Clients: configClients}, nil
 }
