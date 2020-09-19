@@ -25,7 +25,7 @@ of the Config Server do not provide the endpoint necessary to retrieve files for
 Below is an example usage of the library to retrieve a file from the Config Server and to retrieve the application's configurations
 
 * For local config client, there are two ways the create a client
-  1. Call `client.NewLocalClientFromEnv()`. Set the environment variable `CONFIG_SERVER_URLS`. It is a comma separated list of all the base URLs
+  1. Call `NewLocalClientFromEnv()`. Set the environment variable `CONFIG_SERVER_URLS`. It is a comma separated list of all the base URLs
   2. Call `NewLocalClient(baseUrls []string)`. Provide the array of base URLs of Config Servers.
 * For running in Cloud Foundry, ensure a Config Server is bounded to the application. `VCAP_SERVICES` will be provided as an environment variables with the credentials to access the Config Server
 * For connecting to a Config Server via OAuth2 and not deployed to Cloud Foundry, an OAuth2 Client can be created with `CreateOAuth2Client(credentials []cfservices.Credentials)`
