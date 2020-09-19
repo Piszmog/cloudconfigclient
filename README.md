@@ -1,5 +1,6 @@
 # Go Config Server Client
 [![Build Status](https://github.com/Piszmog/cloudconfigclient/workflows/Go/badge.svg)](https://github.com/Piszmog/cloudconfigclient/workflows/Go/badge.svg)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Piszmog_cloudconfigclient&metric=alert_status)](https://sonarcloud.io/dashboard?id=Piszmog_cloudconfigclient)
 [![Coverage Status](https://coveralls.io/repos/github/Piszmog/cloudconfigclient/badge.svg?branch=develop)](https://coveralls.io/github/Piszmog/cloudconfigclient?branch=develop)
 [![Go Report Card](https://goreportcard.com/badge/github.com/Piszmog/cloudconfigclient)](https://goreportcard.com/report/github.com/Piszmog/cloudconfigclient)
 [![GitHub release](https://img.shields.io/github/release/Piszmog/cloudconfigclient.svg)](https://github.com/Piszmog/cloudconfigclient/releases/latest)
