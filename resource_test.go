@@ -1,7 +1,8 @@
-package cloudconfigclient
+package cloudconfigclient_test
 
 import (
 	"errors"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -22,121 +23,120 @@ type example struct {
 }
 
 func TestConfigClient_GetFile(t *testing.T) {
-	configClient := createMockConfigClient(200, testJSONFile, nil)
+	cloudClient := new(MockCloudClient)
+	response := NewMockHttpResponse(200, testJSONFile)
+	cloudClient.On("Get", []string{"default", "default", "directory", "file.json?useDefaultLabel=true"}).Return(response, nil)
+	client := NewConfigClient(cloudClient)
 	var file file
-	err := configClient.GetFile("directory", "file.json", &file)
-	if err != nil {
-		t.Errorf("failed to retrieve file with error %v", err)
-	}
-	if file.Example.Field != "value" {
-		t.Error("failed to retrieve file")
-	}
+	err := client.GetFile("directory", "file.json", &file)
+	assert.NoError(t, err)
+	assert.Equal(t, "value", file.Example.Field)
 }
 
 func TestConfigClient_GetFileWhen404(t *testing.T) {
-	configClient := createMockConfigClient(404, "", nil)
+	cloudClient := new(MockCloudClient)
+	response := NewMockHttpResponse(404, "")
+	cloudClient.On("Get", []string{"default", "default", "directory", "file.json?useDefaultLabel=true"}).
+		Return(response, nil)
+	client := NewConfigClient(cloudClient)
 	var file file
-	err := configClient.GetFile("directory", "file.json", &file)
-	if err == nil {
-		t.Error("expected an error to occur")
-	}
-	if file.Example.Field == "value" {
-		t.Error("retrieved configuration when not found")
-	}
+	err := client.GetFile("directory", "file.json", &file)
+	assert.Error(t, err)
+	assert.Empty(t, file.Example.Field)
 }
 
 func TestConfigClient_GetFileWhenError(t *testing.T) {
-	configClient := createMockConfigClient(500, "", errors.New("failed"))
+	cloudClient := new(MockCloudClient)
+	response := NewMockHttpResponse(500, "")
+	cloudClient.On("Get", []string{"default", "default", "directory", "file.json?useDefaultLabel=true"}).
+		Return(response, errors.New("failed"))
+	client := NewConfigClient(cloudClient)
 	var file file
-	err := configClient.GetFile("directory", "file.json", &file)
-	if err == nil {
-		t.Error("expected an error to occur")
-	}
-	if file.Example.Field == "value" {
-		t.Error("retrieved configuration when not found")
-	}
+	err := client.GetFile("directory", "file.json", &file)
+	assert.Error(t, err)
+	assert.Empty(t, file.Example.Field)
 }
 
 func TestConfigClient_GetFileWhenNoErrorBut500(t *testing.T) {
-	configClient := createMockConfigClient(500, "", nil)
+	cloudClient := new(MockCloudClient)
+	response := NewMockHttpResponse(500, "")
+	cloudClient.On("Get", []string{"default", "default", "directory", "file.json?useDefaultLabel=true"}).
+		Return(response, nil)
+	client := NewConfigClient(cloudClient)
 	var file file
-	err := configClient.GetFile("directory", "file.json", &file)
-	if err == nil {
-		t.Error("expected an error to occur")
-	}
-	if file.Example.Field == "value" {
-		t.Error("retrieved configuration when not found")
-	}
+	err := client.GetFile("directory", "file.json", &file)
+	assert.Error(t, err)
+	assert.Empty(t, file.Example.Field)
 }
 
 func TestConfigClient_GetFileInvalidResponseBody(t *testing.T) {
-	configClient := createMockConfigClient(200, "", nil)
+	cloudClient := new(MockCloudClient)
+	response := NewMockHttpResponse(200, "")
+	cloudClient.On("Get", []string{"default", "default", "directory", "file.json?useDefaultLabel=true"}).
+		Return(response, nil)
+	client := NewConfigClient(cloudClient)
 	var file file
-	err := configClient.GetFile("directory", "file.json", &file)
-	if err == nil {
-		t.Error("expected an error to occur")
-	}
-	if file.Example.Field == "value" {
-		t.Error("retrieved configuration when not found")
-	}
+	err := client.GetFile("directory", "file.json", &file)
+	assert.Error(t, err)
+	assert.Empty(t, file.Example.Field)
 }
 
 func TestConfigClient_GetFileFromBranch(t *testing.T) {
-	configClient := createMockConfigClient(200, testJSONFile, nil)
+	cloudClient := new(MockCloudClient)
+	response := NewMockHttpResponse(200, testJSONFile)
+	cloudClient.On("Get", []string{"default", "default", "branch", "directory", "file.json"}).
+		Return(response, nil)
+	client := NewConfigClient(cloudClient)
 	var file file
-	err := configClient.GetFileFromBranch("branch", "directory", "file.json", &file)
-	if err != nil {
-		t.Errorf("failed to retrieve file with error %v", err)
-	}
-	if file.Example.Field != "value" {
-		t.Error("failed to retrieve file")
-	}
+	err := client.GetFileFromBranch("branch", "directory", "file.json", &file)
+	assert.NoError(t, err)
+	assert.Equal(t, "value", file.Example.Field)
 }
 
 func TestConfigClient_GetFileFromBranchWhen404(t *testing.T) {
-	configClient := createMockConfigClient(404, "", nil)
+	cloudClient := new(MockCloudClient)
+	response := NewMockHttpResponse(404, "")
+	cloudClient.On("Get", []string{"default", "default", "branch", "directory", "file.json"}).
+		Return(response, nil)
+	client := NewConfigClient(cloudClient)
 	var file file
-	err := configClient.GetFileFromBranch("branch", "directory", "file.json", &file)
-	if err == nil {
-		t.Error("expected an error to occur")
-	}
-	if file.Example.Field == "value" {
-		t.Error("retrieved configuration when not found")
-	}
+	err := client.GetFileFromBranch("branch", "directory", "file.json", &file)
+	assert.Error(t, err)
+	assert.Empty(t, file.Example.Field)
 }
 
 func TestConfigClient_GetFileFromBranchWhenError(t *testing.T) {
-	configClient := createMockConfigClient(500, "", errors.New("failed"))
+	cloudClient := new(MockCloudClient)
+	response := NewMockHttpResponse(500, "")
+	cloudClient.On("Get", []string{"default", "default", "branch", "directory", "file.json"}).
+		Return(response, errors.New("failed"))
+	client := NewConfigClient(cloudClient)
 	var file file
-	err := configClient.GetFileFromBranch("branch", "directory", "file.json", &file)
-	if err == nil {
-		t.Error("expected an error to occur")
-	}
-	if file.Example.Field == "value" {
-		t.Error("retrieved configuration when not found")
-	}
+	err := client.GetFileFromBranch("branch", "directory", "file.json", &file)
+	assert.Error(t, err)
+	assert.Empty(t, file.Example.Field)
 }
 
 func TestConfigClient_GetFileFromBranchWhenNoErrorBut500(t *testing.T) {
-	configClient := createMockConfigClient(500, "", nil)
+	cloudClient := new(MockCloudClient)
+	response := NewMockHttpResponse(500, "")
+	cloudClient.On("Get", []string{"default", "default", "branch", "directory", "file.json"}).
+		Return(response, nil)
+	client := NewConfigClient(cloudClient)
 	var file file
-	err := configClient.GetFileFromBranch("branch", "directory", "file.json", &file)
-	if err == nil {
-		t.Error("expected an error to occur")
-	}
-	if file.Example.Field == "value" {
-		t.Error("retrieved configuration when not found")
-	}
+	err := client.GetFileFromBranch("branch", "directory", "file.json", &file)
+	assert.Error(t, err)
+	assert.Empty(t, file.Example.Field)
 }
 
 func TestConfigClient_GetFileFromBranchInvalidResponseBody(t *testing.T) {
-	configClient := createMockConfigClient(200, "", nil)
+	cloudClient := new(MockCloudClient)
+	response := NewMockHttpResponse(200, "")
+	cloudClient.On("Get", []string{"default", "default", "branch", "directory", "file.json"}).
+		Return(response, nil)
+	client := NewConfigClient(cloudClient)
 	var file file
-	err := configClient.GetFileFromBranch("branch", "directory", "file.json", &file)
-	if err == nil {
-		t.Error("expected an error to occur")
-	}
-	if file.Example.Field == "value" {
-		t.Error("retrieved configuration when not found")
-	}
+	err := client.GetFileFromBranch("branch", "directory", "file.json", &file)
+	assert.Error(t, err)
+	assert.Empty(t, file.Example.Field)
 }

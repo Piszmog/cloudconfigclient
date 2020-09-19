@@ -25,8 +25,8 @@ of the Config Server do not provide the endpoint necessary to retrieve files for
 Below is an example usage of the library to retrieve a file from the Config Server and to retrieve the application's configurations
 
 * For local config client, there are two ways the create a client
-  1. Call `client.CreateLocalClientFromEnv()`. Set the environment variable `CONFIG_SERVER_URLS`. It is a comma separated list of all the base URLs
-  2. Call `CreateLocalClient(baseUrls []string)`. Provide the array of base URLs of Config Servers.
+  1. Call `client.NewLocalClientFromEnv()`. Set the environment variable `CONFIG_SERVER_URLS`. It is a comma separated list of all the base URLs
+  2. Call `NewLocalClient(baseUrls []string)`. Provide the array of base URLs of Config Servers.
 * For running in Cloud Foundry, ensure a Config Server is bounded to the application. `VCAP_SERVICES` will be provided as an environment variables with the credentials to access the Config Server
 * For connecting to a Config Server via OAuth2 and not deployed to Cloud Foundry, an OAuth2 Client can be created with `CreateOAuth2Client(credentials []cfservices.Credentials)`
 
@@ -50,11 +50,11 @@ type Example struct {
 
 func main() {
 	// To create a Client for a locally running Spring Config Server
-	configClient, err := cloudconfigclient.CreateLocalClientFromEnv(&http.Client{})
+	configClient, err := cloudconfigclient.NewLocalClientFromEnv(&http.Client{})
 	// Or
-	configClient, err := cloudconfigclient.CreateLocalClient(&http.Client{}, []string{"http://localhost:8888"})
+	configClient, err := cloudconfigclient.NewLocalClient(&http.Client{}, []string{"http://localhost:8888"})
 	// or to create a Client for a Spring Config Server in Cloud Foundry
-	configClient, err := cloudconfigclient.CreateCloudClient()
+	configClient, err := cloudconfigclient.NewCloudClient()
 	// or to create a Client for a Spring Config Server with OAuth2
 	credentials := cfservices.Credentials{
 		Uri:            "config server uri",
@@ -62,7 +62,7 @@ func main() {
 		ClientId:       "client id",
 		AccessTokenUri: "access token uri",
 	}
-	configClient, err := cloudconfigclient.CreateOAuth2Client([]cfservices.Credentials{credentials})
+	configClient, err := cloudconfigclient.NewOAuth2Client([]cfservices.Credentials{credentials})
 	
 	if err != nil {
 		panic(err)

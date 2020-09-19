@@ -24,8 +24,7 @@ func (c ConfigClient) GetFile(directory string, file string, interfaceType inter
 	fileFound := false
 	for _, client := range c.Clients {
 		if err := getResource(client, interfaceType, defaultApplicationName, defaultApplicationProfile, directory, file+"?"+useDefaultLabel); err != nil {
-			var notFoundError *NotFoundError
-			if errors.As(err, &notFoundError) {
+			if errors.As(err, &notFoundErrorType) {
 				continue
 			}
 			return err
@@ -45,8 +44,7 @@ func (c *ConfigClient) GetFileFromBranch(branch string, directory string, file s
 	fileFound := false
 	for _, client := range c.Clients {
 		if err := getResource(client, interfaceType, defaultApplicationName, defaultApplicationProfile, branch, directory, file); err != nil {
-			var notFoundError *NotFoundError
-			if errors.As(err, &notFoundError) {
+			if errors.As(err, &notFoundErrorType) {
 				continue
 			}
 			return err

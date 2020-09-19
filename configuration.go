@@ -6,8 +6,6 @@ import (
 	"strings"
 )
 
-var notFoundError *NotFoundError
-
 // Source is the application's source configurations. It con contain zero to n number of property sources.
 type Source struct {
 	Name            string           `json:"name"`
@@ -28,7 +26,7 @@ type PropertySource struct {
 
 // Configuration interface for retrieving an application's configuration files from the Config Server.
 type Configuration interface {
-	GetConfiguration(applicationName string, profiles []string) (*Source, error)
+	GetConfiguration(applicationName string, profiles []string) (Source, error)
 }
 
 // GetConfiguration retrieves the configurations/property sources of an application based on the name of the application
@@ -37,7 +35,7 @@ func (c ConfigClient) GetConfiguration(applicationName string, profiles []string
 	var source Source
 	for _, client := range c.Clients {
 		if err := getResource(client, &source, applicationName, joinProfiles(profiles)); err != nil {
-			if errors.As(err, &notFoundError) {
+			if errors.As(err, &notFoundErrorType) {
 				continue
 			}
 			return Source{}, err

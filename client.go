@@ -9,17 +9,9 @@ import (
 	"path"
 )
 
-// NotFoundError is a special error that is used to propagate 404s.
-type NotFoundError struct {
-}
-
-// Error return the error message.
-func (r NotFoundError) Error() string {
-	return "failed to find resource"
-}
-
 // ConfigClient contains the clients of the Config Servers.
 type ConfigClient struct {
+	// Clients are all the config server clients
 	Clients []CloudClient
 }
 
@@ -30,17 +22,19 @@ type CloudClient interface {
 
 // Client that wraps http.Client and the base Uri of the http client
 type Client struct {
-	configUri  string
-	httpClient *http.Client
+	// ConfigUri is the uri of the config server
+	ConfigUri string
+	// HttpClient is the HTTP client to use to make the HTTP requests and handle responses
+	HttpClient *http.Client
 }
 
 // Get performs a REST GET
-func (client Client) Get(uriVariables ...string) (*http.Response, error) {
-	fullUrl, err := createUrl(client.configUri, uriVariables...)
+func (c Client) Get(uriVariables ...string) (*http.Response, error) {
+	fullUrl, err := createUrl(c.ConfigUri, uriVariables...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create url: %w", err)
 	}
-	response, err := client.httpClient.Get(fullUrl)
+	response, err := c.HttpClient.Get(fullUrl)
 	if err != nil {
 		return nil, fmt.Errorf("failed to retrieve from %s: %w", fullUrl, err)
 	}
@@ -65,7 +59,7 @@ func getResource(client CloudClient, dest interface{}, uriVariables ...string) e
 	}
 	defer closeResource(resp.Body)
 	if resp.StatusCode == 404 {
-		return &NotFoundError{}
+		return notFoundError
 	}
 	if resp.StatusCode != 200 {
 		b, err := ioutil.ReadAll(resp.Body)
