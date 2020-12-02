@@ -32,15 +32,56 @@ const (
     }
   ]
 }`
+	vcapServicesV3 = `{
+  "p.config-server": [
+    {
+      "name": "config-server",
+      "instance_name": "config-server",
+      "binding_name": null,
+      "credentials": {
+        "uri": "https://config-uri.com",
+        "client_secret": "clientSecret",
+        "client_id": "config-client-id",
+        "access_token_uri": "https://tokenuri.com"
+      },
+      "syslog_drain_url": null,
+      "volume_mounts": [],
+      "label": "p-config-server",
+      "provider": null,
+      "plan": "testPlan",
+      "tags": [
+        "testTag"
+      ]
+    }
+  ]
+}`
 )
 
-func TestNewCloudClient(t *testing.T) {
+func TestNewCloudClientV2(t *testing.T) {
 	err := os.Setenv(cfservices.VCAPServices, vcapServices)
 	assert.NoError(t, err)
 	defer os.Unsetenv(cfservices.VCAPServices)
 	configClient, err := cloudconfigclient.NewCloudClient()
 	assert.NoError(t, err)
 	assert.NotNil(t, configClient)
+}
+
+func TestNewCloudClientV3(t *testing.T) {
+	err := os.Setenv(cfservices.VCAPServices, vcapServicesV3)
+	assert.NoError(t, err)
+	defer os.Unsetenv(cfservices.VCAPServices)
+	configClient, err := cloudconfigclient.NewCloudClient()
+	assert.NoError(t, err)
+	assert.NotNil(t, configClient)
+}
+
+func TestNewCloudClientMissingService(t *testing.T) {
+	err := os.Setenv(cfservices.VCAPServices, "{}")
+	assert.NoError(t, err)
+	defer os.Unsetenv(cfservices.VCAPServices)
+	configClient, err := cloudconfigclient.NewCloudClient()
+	assert.Error(t, err)
+	assert.Nil(t, configClient)
 }
 
 func TestNewCloudClientWhenENVNotSet(t *testing.T) {
@@ -53,13 +94,13 @@ func TestGetCloudCredentials(t *testing.T) {
 	err := os.Setenv(cfservices.VCAPServices, vcapServices)
 	assert.NoError(t, err)
 	defer os.Unsetenv(cfservices.VCAPServices)
-	serviceCredentials, err := cloudconfigclient.GetCloudCredentials(cloudconfigclient.DefaultConfigServerName)
+	serviceCredentials, err := cloudconfigclient.GetCloudCredentials(cloudconfigclient.ConfigServerName)
 	assert.NoError(t, err)
 	assert.NotNil(t, serviceCredentials)
 }
 
 func TestGetCloudCredentialsWhenENVNotSet(t *testing.T) {
-	serviceCredentials, err := cloudconfigclient.GetCloudCredentials(cloudconfigclient.DefaultConfigServerName)
+	serviceCredentials, err := cloudconfigclient.GetCloudCredentials(cloudconfigclient.ConfigServerName)
 	assert.Error(t, err)
 	assert.Nil(t, serviceCredentials)
 }
