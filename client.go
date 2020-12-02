@@ -58,10 +58,10 @@ func getResource(client CloudClient, dest interface{}, uriVariables ...string) e
 		return err
 	}
 	defer closeResource(resp.Body)
-	if resp.StatusCode == 404 {
+	if resp.StatusCode == http.StatusNotFound {
 		return notFoundError
 	}
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != http.StatusOK {
 		b, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			return fmt.Errorf("failed to read body with status code %d: %w", resp.StatusCode, err)
