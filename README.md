@@ -21,6 +21,15 @@ This library provides clients the ability to load Configurations and Files from 
 This library is compatible with versions of Spring Config Server greater than or equal to `1.4.x.RELEASE`. Prior versions 
 of the Config Server do not provide the endpoint necessary to retrieve files for the Config Server's default branch.
 
+#### Spring Cloud Config Server v3.x
+Since Spring Cloud Services v3.0, the service name in `VCAP_SERVICES` has changed from `p-config-server` to be `p.config-server`.
+
+To help mitigate migration difficulties, `cloudconfigclient.NewCloudClient()` will first search for the service `p-config-server` (v2.x). If the v2.x service could not be found, 
+`p.config-server` (v3.x) will be search for.
+
+See [Spring Cloud Services Differences](https://docs.pivotal.io/spring-cloud-services/3-1/common/config-server/managing-service-instances.html#differences-between-3-0-and-earlier) 
+for more details.
+
 ## Example Usage
 Below is an example usage of the library to retrieve a file from the Config Server and to retrieve the application's configurations
 
@@ -160,3 +169,12 @@ The functions available to retrieve resource files are, `GetFile(directory strin
 `GetFileFromBranch(branch string, directory string, file string, interfaceType interface{})`.
 
 * The `interfaceType` is the object to deserialize the file to
+
+### Spring Cloud Config Server v3.x Changes
+SCS v3.x slightly changed how files are retrieved. If the Config Server specified a directory in the `searchPaths`, the path should be excluded from the `GetFile(..)` invocation.
+
+For example if `common` has been specified in the `searchPaths` and the file `common/foo.txt` needs to be retrieved, then the `directory` to provide to `GetFile(..)` 
+should be `""` (blank).
+
+This differs with SCS v2.x where the directory in `searchPaths` did not impact the `directory` provided to `GetFile(..)` (e.g. to retrieve file `common/foo.txt`, 
+`directory` would be `"common"`).
