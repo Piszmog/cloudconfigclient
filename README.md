@@ -117,6 +117,20 @@ Structure of the `VCAP_SERVICES` value
 }
 ```
 
+##### CredHub Reference
+Newer versions of PCF (>=2.6) may have services that use a CredHub Reference to store credential information.
+
+When viewing the Environment Variables of an application via the UI, the credentials may appear as the following
+
+```json
+{
+  "credentials": {
+    "credhub-ref": "/c/example-service-broker/example-service/faa677f5-25cd-4f1e-8921-14a9d5ab48b8/credentials"
+  }
+}
+```
+
+When the application starts up, the `credhub-ref` is replaced with the actual credential values that application will need to connect to the service.
 
 ## Configurations
 The Config Server allows the ability to retrieve configurations for an application. Only files that follow a strict naming 
