@@ -10,16 +10,36 @@ import (
 )
 
 const (
-	// DefaultConfigServerName the default name of the config server in PCF
-	DefaultConfigServerName = "p-config-server"
+	// ConfigServerName the service name of the Config Server in PCF.
+	ConfigServerName = "p-config-server"
+	// SpringCloudConfigServerName the service name of the Spring Cloud Config Server in PCF.
+	SpringCloudConfigServerName = "p.config-server"
 )
 
 // NewCloudClient creates a ConfigClient to access Config Servers running in the cloud (specifically Cloud Foundry).
 //
-// The environment variables 'VCAP_SERVICES' provides a JSON that contains an entry with the key 'p-config-server'. This
-// entry and used to build an OAuth2 client.
+// The environment variable 'VCAP_SERVICES' provides a JSON that contains an entry with the key 'p-config-server' (v2.x)
+// or 'p.config-server' (v3.x).
+// The service 'p-config-server' is search for first. If not found, 'p.config-server' is searched for.
 func NewCloudClient() (*ConfigClient, error) {
-	return NewCloudClientForService(DefaultConfigServerName)
+	service, err := NewCloudClientForService(ConfigServerName)
+	if err != nil {
+		// if the v2 config server could not be found, let's check if v3 exists
+		if errors.Is(err, cfservices.MissingServiceError) {
+			service, err = NewCloudClientForService(SpringCloudConfigServerName)
+			if err != nil {
+				// if still not found, let's return a very specific message to help point developers in right direction
+				if errors.Is(err, cfservices.MissingServiceError) {
+					return nil, fmt.Errorf("neither %s or %s exist in environment variable 'VCAP_SERVICES'",
+						ConfigServerName, SpringCloudConfigServerName)
+				}
+				return nil, err
+			}
+		} else {
+			return nil, err
+		}
+	}
+	return service, err
 }
 
 // NewCloudClientForService creates a ConfigClient to access Config Servers running in the cloud (specifically Cloud Foundry).
@@ -73,7 +93,7 @@ func NewOAuth2Config(cred *cfservices.Credentials) (*clientcredentials.Config, e
 func GetCloudCredentials(name string) (*cfservices.ServiceCredentials, error) {
 	serviceCreds, err := cfservices.GetServiceCredentialsFromEnvironment(name)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get credentials for the Config Server service %s: %w", name, err)
+		return nil, fmt.Errorf("failed to get credentials for the service %s: %w", name, err)
 	}
 	return serviceCreds, nil
 }
