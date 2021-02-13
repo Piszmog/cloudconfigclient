@@ -42,6 +42,7 @@ func main() {
 
 	// load a specific file (e.g. json/txt)
 	var f map[string]string
+	// if 'fooDir' has been added to 'searchPaths' in SCS v3.x, then pass "" (blank) for directory
 	if err = client.GetFile("fooDir", "bar.json", &f); err != nil {
 		log.Fatalln(err)
 	}
@@ -49,6 +50,7 @@ func main() {
 
 	// load a specific file (e.g. json/txt)
 	var b map[string]string
+	// if 'fooDir' has been added to 'searchPaths' in SCS v3.x, then pass "" (blank) for directory
 	if err = client.GetFileFromBranch("develop", "fooDir", "bar.json", &b); err != nil {
 		log.Fatalln(err)
 	}
