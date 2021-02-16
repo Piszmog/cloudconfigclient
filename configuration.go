@@ -3,6 +3,7 @@ package cloudconfigclient
 import (
 	"errors"
 	"fmt"
+	"path/filepath"
 	"strings"
 )
 
@@ -14,6 +15,41 @@ type Source struct {
 	Version         string           `json:"version"`
 	State           string           `json:"state"`
 	PropertySources []PropertySource `json:"propertySources"`
+}
+
+// GetPropertySource retrieves the PropertySource that has the specifies fileName. The fileName is the name of the file
+// with extension - e.g. application-foo.yml.
+//
+// Usually the Config Server will return the PropertySource.Name as an URL of sorts
+// (e.g. ssh://base-url.com/path/to/repository/path/to/file.[yml/properties]). So in order to find the specific file
+// with the desired configurations, the ending of the name needs to be matched against.
+func (s Source) GetPropertySource(fileName string) (PropertySource, error) {
+	for _, propertySource := range s.PropertySources {
+		if strings.HasSuffix(propertySource.Name, fileName) {
+			return propertySource, nil
+		}
+	}
+	return PropertySource{}, PropertySourceDoesNotExistErr
+}
+
+// PropertySourceDoesNotExistErr is the error that is returned when there are no PropertySource that match the specified
+// file name.
+var PropertySourceDoesNotExistErr = errors.New("property source does not exist")
+
+// PropertySourceHandler handles the specific PropertySource.
+type PropertySourceHandler func(propertySource PropertySource)
+
+// HandlePropertySources handles all PropertySource configurations that are files. This is a convenience method to
+// handle boilerplate for-loop code and filtering of non-configuration files.
+//
+// Config Server may return other configurations (e.g. credhub proeprty sources) that contain no configurations
+// (PropertySource.Source is empty).
+func (s Source) HandlePropertySources(handler PropertySourceHandler) {
+	for _, propertySource := range s.PropertySources {
+		if len(filepath.Ext(propertySource.Name)) > 0 {
+			handler(propertySource)
+		}
+	}
 }
 
 // PropertySource is the property source for the application.

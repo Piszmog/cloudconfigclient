@@ -21,16 +21,17 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	var localProp cloudconfigclient.PropertySource
-	for _, source := range configuration.PropertySources {
-		if strings.HasSuffix(source.Name, "application-cloud.yml") {
-			localProp = source
-		}
-	}
-	if len(localProp.Name) == 0 {
+	localProp, err := configuration.GetPropertySource("application-cloud.yml")
+	if err != nil {
 		log.Fatalln("failed to find cloud property file")
 	}
 	fmt.Printf("cloud property file: %+v\n", localProp)
+	// handle all config properties
+	configuration.HandlePropertySources(func(propertySource cloudconfigclient.PropertySource) {
+		if strings.HasSuffix(propertySource.Name, "test-app.properties") {
+			// TODO save off values
+		}
+	})
 
 	// load a specific file (e.g. json/txt)
 	var f map[string]string
