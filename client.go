@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"strings"
 )
 
 // ConfigClient contains the clients of the Config Servers.
@@ -17,7 +18,7 @@ type ConfigClient struct {
 
 // CloudClient interacts with the Config Server's REST APIs
 type CloudClient interface {
-	Get(uriVariables ...string) (*http.Response, error)
+	Get(uriPaths ...string) (*http.Response, error)
 }
 
 // Client that wraps http.Client and the base Uri of the http client
@@ -29,8 +30,8 @@ type Client struct {
 }
 
 // Get performs a REST GET
-func (c Client) Get(uriVariables ...string) (*http.Response, error) {
-	fullUrl, err := createUrl(c.ConfigUri, uriVariables...)
+func (c Client) Get(uriPaths ...string) (*http.Response, error) {
+	fullUrl, err := createUrl(c.ConfigUri, uriPaths...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create url: %w", err)
 	}
@@ -41,19 +42,32 @@ func (c Client) Get(uriVariables ...string) (*http.Response, error) {
 	return response, nil
 }
 
-func createUrl(baseUrl string, uriVariables ...string) (string, error) {
+func createUrl(baseUrl string, uriPaths ...string) (string, error) {
 	parseUrl, err := url.Parse(baseUrl)
 	if err != nil {
 		return "", fmt.Errorf("failed to parse url %s: %w", baseUrl, err)
 	}
-	for _, variable := range uriVariables {
-		parseUrl.Path = path.Join(parseUrl.Path, variable)
+	var params url.Values
+	for _, uriPath := range uriPaths {
+		if strings.Contains(uriPath, "?") {
+			parts := strings.Split(uriPath, "?")
+			parseUrl.Path = path.Join(parseUrl.Path, parts[0])
+			params = url.Values{}
+			queryParts := strings.Split(parts[1], "=")
+			params.Add(queryParts[0], queryParts[1])
+			break
+		} else {
+			parseUrl.Path = path.Join(parseUrl.Path, uriPath)
+		}
+	}
+	if len(params) > 0 {
+		parseUrl.RawQuery = params.Encode()
 	}
 	return parseUrl.String(), nil
 }
 
-func getResource(client CloudClient, dest interface{}, uriVariables ...string) error {
-	resp, err := client.Get(uriVariables...)
+func getResource(client CloudClient, dest interface{}, uriPaths ...string) error {
+	resp, err := client.Get(uriPaths...)
 	if err != nil {
 		return err
 	}

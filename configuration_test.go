@@ -26,7 +26,7 @@ const (
 )
 
 func TestConfigClient_GetConfiguration(t *testing.T) {
-	mockClient := new(MockCloudClient)
+	mockClient := new(mockCloudClient)
 	response := NewMockHttpResponse(200, configurationSource)
 	mockClient.On("Get", []string{"appName", "profile"}).Return(response, nil)
 	client := NewConfigClient(mockClient)
@@ -35,7 +35,7 @@ func TestConfigClient_GetConfiguration(t *testing.T) {
 }
 
 func TestConfigClient_GetConfigurationWhen404(t *testing.T) {
-	mockClient := new(MockCloudClient)
+	mockClient := new(mockCloudClient)
 	response := NewMockHttpResponse(404, "")
 	mockClient.On("Get", []string{"appName", "profile"}).Return(response, nil)
 	client := NewConfigClient(mockClient)
@@ -44,7 +44,7 @@ func TestConfigClient_GetConfigurationWhen404(t *testing.T) {
 }
 
 func TestConfigClient_GetConfigurationWhenError(t *testing.T) {
-	mockClient := new(MockCloudClient)
+	mockClient := new(mockCloudClient)
 	response := NewMockHttpResponse(500, configurationSource)
 	mockClient.On("Get", []string{"appName", "profile"}).Return(response, errors.New("failed"))
 	client := NewConfigClient(mockClient)
@@ -53,7 +53,7 @@ func TestConfigClient_GetConfigurationWhenError(t *testing.T) {
 }
 
 func TestConfigClient_GetConfigurationWhenNoErrorBut500(t *testing.T) {
-	mockClient := new(MockCloudClient)
+	mockClient := new(mockCloudClient)
 	response := NewMockHttpResponse(500, configurationSource)
 	mockClient.On("Get", []string{"appName", "profile"}).Return(response, nil)
 	client := NewConfigClient(mockClient)
@@ -62,7 +62,7 @@ func TestConfigClient_GetConfigurationWhenNoErrorBut500(t *testing.T) {
 }
 
 func TestConfigClient_GetConfigurationInvalidResponseBody(t *testing.T) {
-	mockClient := new(MockCloudClient)
+	mockClient := new(mockCloudClient)
 	response := NewMockHttpResponse(200, "")
 	mockClient.On("Get", []string{"appName", "profile"}).Return(response, nil)
 	client := NewConfigClient(mockClient)

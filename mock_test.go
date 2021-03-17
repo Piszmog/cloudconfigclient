@@ -8,12 +8,12 @@ import (
 	"net/http"
 )
 
-// MockCloudClient is the mocked object that implements CloudClient
-type MockCloudClient struct {
+// mockCloudClient is the mocked object that implements CloudClient
+type mockCloudClient struct {
 	mock.Mock
 }
 
-func (c *MockCloudClient) Get(uriVariables ...string) (resp *http.Response, err error) {
+func (c *mockCloudClient) Get(uriVariables ...string) (resp *http.Response, err error) {
 	args := c.Called(uriVariables)
 	return args.Get(0).(*http.Response), args.Error(1)
 }
@@ -27,7 +27,7 @@ func (f RoundTripFunc) RoundTrip(req *http.Request) (*http.Response, error) {
 // NewMockHttpClient creates a mocked HTTP client
 func NewMockHttpClient(fn RoundTripFunc) *http.Client {
 	return &http.Client{
-		Transport: RoundTripFunc(fn),
+		Transport: fn,
 	}
 }
 
