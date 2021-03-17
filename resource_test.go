@@ -15,7 +15,7 @@ const (
 )
 
 type file struct {
-	Example example `json:"example"`
+	Example example `json:"example" yaml:"example"`
 }
 
 type example struct {
@@ -29,6 +29,28 @@ func TestConfigClient_GetFile(t *testing.T) {
 	client := NewConfigClient(cloudClient)
 	var f file
 	err := client.GetFile("directory", "file.json", &f)
+	assert.NoError(t, err)
+	assert.Equal(t, "value", f.Example.Field)
+}
+
+func TestConfigClient_GetFile_YML(t *testing.T) {
+	cloudClient := new(mockCloudClient)
+	response := NewMockHttpResponse(200, testJSONFile)
+	cloudClient.On("Get", []string{"default", "default", "directory", "file.yml?useDefaultLabel=true"}).Return(response, nil)
+	client := NewConfigClient(cloudClient)
+	var f file
+	err := client.GetFile("directory", "file.yml", &f)
+	assert.NoError(t, err)
+	assert.Equal(t, "value", f.Example.Field)
+}
+
+func TestConfigClient_GetFile_YAML(t *testing.T) {
+	cloudClient := new(mockCloudClient)
+	response := NewMockHttpResponse(200, testJSONFile)
+	cloudClient.On("Get", []string{"default", "default", "directory", "file.yaml?useDefaultLabel=true"}).Return(response, nil)
+	client := NewConfigClient(cloudClient)
+	var f file
+	err := client.GetFile("directory", "file.yaml", &f)
 	assert.NoError(t, err)
 	assert.Equal(t, "value", f.Example.Field)
 }

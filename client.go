@@ -3,6 +3,7 @@ package cloudconfigclient
 import (
 	"encoding/json"
 	"fmt"
+	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -82,8 +83,14 @@ func getResource(client CloudClient, dest interface{}, uriPaths ...string) error
 		}
 		return fmt.Errorf("server responded with status code %d and body %s", resp.StatusCode, b)
 	}
-	if err := json.NewDecoder(resp.Body).Decode(dest); err != nil {
-		return fmt.Errorf("failed to decode response from url: %w", err)
+	if strings.Contains(uriPaths[len(uriPaths)-1], ".yml") || strings.Contains(uriPaths[len(uriPaths)-1], ".yaml") {
+		if err = yaml.NewDecoder(resp.Body).Decode(dest); err != nil {
+			return fmt.Errorf("failed to decode response from url: %w", err)
+		}
+	} else {
+		if err = json.NewDecoder(resp.Body).Decode(dest); err != nil {
+			return fmt.Errorf("failed to decode response from url: %w", err)
+		}
 	}
 	return nil
 }
