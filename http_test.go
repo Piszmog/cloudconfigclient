@@ -148,6 +148,14 @@ func TestHTTPClient_GetResource(t *testing.T) {
 			expected:    map[string]interface{}{"foo": "bar"},
 		},
 		{
+			name:        "YAML Response Malformed",
+			paths:       []string{"file.yaml"},
+			params:      map[string]string{"useDefault": "true"},
+			destination: make(map[string]interface{}),
+			response:    NewMockHttpResponse(http.StatusOK, ""),
+			err:         errors.New("failed to decode response from url: EOF"),
+		},
+		{
 			name:        "YML Response",
 			paths:       []string{"file.yml"},
 			params:      map[string]string{"useDefault": "true"},
@@ -164,12 +172,28 @@ func TestHTTPClient_GetResource(t *testing.T) {
 			expected:    map[string]interface{}{"foo": "bar"},
 		},
 		{
+			name:        "JSON Response Malformed",
+			paths:       []string{"file.json"},
+			params:      map[string]string{"useDefault": "true"},
+			destination: make(map[string]interface{}),
+			response:    NewMockHttpResponse(http.StatusOK, `{"foo":"bar"`),
+			err:         errors.New("failed to decode response from url: unexpected EOF"),
+		},
+		{
 			name:        "XML Response",
 			paths:       []string{"file.xml"},
 			params:      map[string]string{"useDefault": "true"},
 			destination: new(xmlResp),
 			response:    NewMockHttpResponse(http.StatusOK, `"<data><foo>bar</foo></data>"`),
 			expected:    &xmlResp{Foo: "bar"},
+		},
+		{
+			name:        "XML Response Malformed",
+			paths:       []string{"file.xml"},
+			params:      map[string]string{"useDefault": "true"},
+			destination: new(xmlResp),
+			response:    NewMockHttpResponse(http.StatusOK, `"<data><foo>bar</foo></data"`),
+			err:         errors.New("failed to decode response from url: XML syntax error on line 1: invalid characters between </data and >"),
 		},
 	}
 	for _, test := range tests {
