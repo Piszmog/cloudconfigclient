@@ -22,8 +22,7 @@ const (
 
 // ConfigClient contains the clients of the Config Servers.
 type ConfigClient struct {
-	// Clients are the HTTP clients per Config Server instance.
-	Clients []*httpClient
+	clients []*httpClient
 }
 
 // New creates a new ConfigClient based on the provided options. A ConfigClient can be configured to communicate with
@@ -40,7 +39,7 @@ func New(options ...Option) (*ConfigClient, error) {
 			return nil, err
 		}
 	}
-	return &ConfigClient{Clients: clients}, nil
+	return &ConfigClient{clients: clients}, nil
 }
 
 // Option creates a slice of httpClients per Config Server instance.

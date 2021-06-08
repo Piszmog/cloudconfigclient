@@ -24,7 +24,7 @@ type Resource interface {
 func (c *ConfigClient) GetFile(directory string, file string, interfaceType interface{}) error {
 	fileFound := false
 	paths := []string{defaultApplicationName, defaultApplicationProfile, directory, file}
-	for _, client := range c.Clients {
+	for _, client := range c.clients {
 		if err := client.getResource(paths, useDefaultLabel, interfaceType); err != nil {
 			if errors.As(err, &notFoundError) {
 				continue
@@ -45,7 +45,7 @@ func (c *ConfigClient) GetFile(directory string, file string, interfaceType inte
 func (c *ConfigClient) GetFileFromBranch(branch string, directory string, file string, interfaceType interface{}) error {
 	fileFound := false
 	paths := []string{defaultApplicationName, defaultApplicationProfile, branch, directory, file}
-	for _, client := range c.Clients {
+	for _, client := range c.clients {
 		if err := client.getResource(paths, nil, interfaceType); err != nil {
 			if errors.As(err, &notFoundError) {
 				continue
