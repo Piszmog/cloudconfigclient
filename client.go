@@ -22,7 +22,7 @@ const (
 
 // Client contains the clients of the Config Servers.
 type Client struct {
-	clients []*httpClient
+	clients []*HTTPClient
 }
 
 // New creates a new Client based on the provided options. A Client can be configured to communicate with
@@ -30,7 +30,7 @@ type Client struct {
 //
 // At least one option must be provided.
 func New(options ...Option) (*Client, error) {
-	var clients []*httpClient
+	var clients []*HTTPClient
 	if len(options) == 0 {
 		return nil, errors.New("at least one option must be provided")
 	}
@@ -43,12 +43,12 @@ func New(options ...Option) (*Client, error) {
 }
 
 // Option creates a slice of httpClients per Config Server instance.
-type Option func([]*httpClient) error
+type Option func([]*HTTPClient) error
 
 // LocalEnv creates a clients for a locally running Config Servers. The URLs to the Config Servers are acquired from the
 // environment variable 'CONFIG_SERVER_URLS'.
 func LocalEnv(client *http.Client) Option {
-	return func(clients []*httpClient) error {
+	return func(clients []*HTTPClient) error {
 		httpClients, err := newLocalClientFromEnv(client)
 		if err != nil {
 			return err
@@ -58,7 +58,7 @@ func LocalEnv(client *http.Client) Option {
 	}
 }
 
-func newLocalClientFromEnv(client *http.Client) ([]*httpClient, error) {
+func newLocalClientFromEnv(client *http.Client) ([]*HTTPClient, error) {
 	localUrls := os.Getenv(EnvironmentLocalConfigServerUrls)
 	if len(localUrls) == 0 {
 		return nil, fmt.Errorf("no local Config Server URLs provided in environment variable %s", EnvironmentLocalConfigServerUrls)
@@ -68,16 +68,16 @@ func newLocalClientFromEnv(client *http.Client) ([]*httpClient, error) {
 
 // Local creates a clients for a locally running Config Servers.
 func Local(client *http.Client, urls []string) Option {
-	return func(clients []*httpClient) error {
+	return func(clients []*HTTPClient) error {
 		clients = append(clients, newLocalClient(client, urls)...)
 		return nil
 	}
 }
 
-func newLocalClient(client *http.Client, urls []string) []*httpClient {
-	clients := make([]*httpClient, len(urls), len(urls))
+func newLocalClient(client *http.Client, urls []string) []*HTTPClient {
+	clients := make([]*HTTPClient, len(urls), len(urls))
 	for index, baseUrl := range urls {
-		clients[index] = &httpClient{baseURL: baseUrl, client: client}
+		clients[index] = &HTTPClient{baseURL: baseUrl, client: client}
 	}
 	return clients
 }
@@ -88,7 +88,7 @@ func newLocalClient(client *http.Client, urls []string) []*httpClient {
 //
 // The service 'p.config-server' is search for first. If not found, 'p-config-server' is searched for.
 func DefaultCFService() Option {
-	return func(clients []*httpClient) error {
+	return func(clients []*HTTPClient) error {
 		httpClients, err := newCloudClientForService(SpringCloudConfigServerName)
 		if err != nil {
 			if errors.Is(err, cfservices.MissingServiceError) {
@@ -115,7 +115,7 @@ func DefaultCFService() Option {
 // variable 'VCAP_SERVICES' provides a JSON. The JSON should contain the entry matching the specified name. This
 // entry and used to build an OAuth client.
 func CFService(service string) Option {
-	return func(clients []*httpClient) error {
+	return func(clients []*HTTPClient) error {
 		httpClients, err := newCloudClientForService(service)
 		if err != nil {
 			return err
@@ -125,14 +125,14 @@ func CFService(service string) Option {
 	}
 }
 
-func newCloudClientForService(name string) ([]*httpClient, error) {
+func newCloudClientForService(name string) ([]*HTTPClient, error) {
 	creds, err := getCloudCredentials(name)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create cloud client: %w", err)
 	}
-	clients := make([]*httpClient, len(creds.Credentials), len(creds.Credentials))
+	clients := make([]*HTTPClient, len(creds.Credentials), len(creds.Credentials))
 	for i, cred := range creds.Credentials {
-		clients[i] = &httpClient{baseURL: cred.Uri, client: newOAuth2Client(cred.ClientId, cred.ClientSecret, cred.AccessTokenUri)}
+		clients[i] = &HTTPClient{baseURL: cred.Uri, client: newOAuth2Client(cred.ClientId, cred.ClientSecret, cred.AccessTokenUri)}
 	}
 	return clients, nil
 }
@@ -140,15 +140,15 @@ func newCloudClientForService(name string) ([]*httpClient, error) {
 func getCloudCredentials(name string) (*cfservices.ServiceCredentials, error) {
 	serviceCreds, err := cfservices.GetServiceCredentialsFromEnvironment(name)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get credentials for the service %s: %w", name, err)
+		return nil, fmt.Errorf("failed to Get credentials for the service %s: %w", name, err)
 	}
 	return serviceCreds, nil
 }
 
 // OAuth2 creates a client for a Config Server based on the provided OAuth2.0 information.
 func OAuth2(baseURL string, clientId string, secret string, tokenURI string) Option {
-	return func(clients []*httpClient) error {
-		clients = append(clients, &httpClient{baseURL: baseURL, client: newOAuth2Client(clientId, secret, tokenURI)})
+	return func(clients []*HTTPClient) error {
+		clients = append(clients, &HTTPClient{baseURL: baseURL, client: newOAuth2Client(clientId, secret, tokenURI)})
 		return nil
 	}
 }

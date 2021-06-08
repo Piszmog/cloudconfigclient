@@ -25,7 +25,7 @@ func (c *Client) GetFile(directory string, file string, interfaceType interface{
 	fileFound := false
 	paths := []string{defaultApplicationName, defaultApplicationProfile, directory, file}
 	for _, client := range c.clients {
-		if err := client.getResource(paths, useDefaultLabel, interfaceType); err != nil {
+		if err := client.GetResource(paths, useDefaultLabel, interfaceType); err != nil {
 			if errors.As(err, &notFoundError) {
 				continue
 			}
@@ -46,7 +46,7 @@ func (c *Client) GetFileFromBranch(branch string, directory string, file string,
 	fileFound := false
 	paths := []string{defaultApplicationName, defaultApplicationProfile, branch, directory, file}
 	for _, client := range c.clients {
-		if err := client.getResource(paths, nil, interfaceType); err != nil {
+		if err := client.GetResource(paths, nil, interfaceType); err != nil {
 			if errors.As(err, &notFoundError) {
 				continue
 			}

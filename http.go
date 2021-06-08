@@ -12,15 +12,15 @@ import (
 	"strings"
 )
 
-type httpClient struct {
+type HTTPClient struct {
 	baseURL string
 	client  *http.Client
 }
 
 var notFoundError = errors.New("failed to find resource")
 
-func (h *httpClient) getResource(paths []string, params map[string]string, dest interface{}) error {
-	resp, err := h.get(paths, params)
+func (h *HTTPClient) GetResource(paths []string, params map[string]string, dest interface{}) error {
+	resp, err := h.Get(paths, params)
 	if err != nil {
 		return err
 	}
@@ -48,7 +48,7 @@ func (h *httpClient) getResource(paths []string, params map[string]string, dest 
 	return nil
 }
 
-func (h *httpClient) get(paths []string, params map[string]string) (*http.Response, error) {
+func (h *HTTPClient) Get(paths []string, params map[string]string) (*http.Response, error) {
 	fullUrl, err := newURL(h.baseURL, paths, params)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create url: %w", err)
