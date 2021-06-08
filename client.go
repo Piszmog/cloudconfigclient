@@ -35,7 +35,7 @@ func New(options ...Option) (*Client, error) {
 		return nil, errors.New("at least one option must be provided")
 	}
 	for _, option := range options {
-		if err := option(clients); err != nil {
+		if err := option(&clients); err != nil {
 			return nil, err
 		}
 	}
@@ -43,17 +43,17 @@ func New(options ...Option) (*Client, error) {
 }
 
 // Option creates a slice of httpClients per Config Server instance.
-type Option func([]*HTTPClient) error
+type Option func(*[]*HTTPClient) error
 
 // LocalEnv creates a clients for a locally running Config Servers. The URLs to the Config Servers are acquired from the
 // environment variable 'CONFIG_SERVER_URLS'.
 func LocalEnv(client *http.Client) Option {
-	return func(clients []*HTTPClient) error {
+	return func(clients *[]*HTTPClient) error {
 		httpClients, err := newLocalClientFromEnv(client)
 		if err != nil {
 			return err
 		}
-		clients = append(clients, httpClients...)
+		*clients = append(*clients, httpClients...)
 		return nil
 	}
 }
@@ -67,9 +67,9 @@ func newLocalClientFromEnv(client *http.Client) ([]*HTTPClient, error) {
 }
 
 // Local creates a clients for a locally running Config Servers.
-func Local(client *http.Client, urls []string) Option {
-	return func(clients []*HTTPClient) error {
-		clients = append(clients, newLocalClient(client, urls)...)
+func Local(client *http.Client, urls ...string) Option {
+	return func(clients *[]*HTTPClient) error {
+		*clients = append(*clients, newLocalClient(client, urls)...)
 		return nil
 	}
 }
@@ -88,11 +88,11 @@ func newLocalClient(client *http.Client, urls []string) []*HTTPClient {
 //
 // The service 'p.config-server' is search for first. If not found, 'p-config-server' is searched for.
 func DefaultCFService() Option {
-	return func(clients []*HTTPClient) error {
+	return func(clients *[]*HTTPClient) error {
 		httpClients, err := newCloudClientForService(SpringCloudConfigServerName)
 		if err != nil {
 			if errors.Is(err, cfservices.MissingServiceError) {
-				httpClients, err = newCloudClientForService(SpringCloudConfigServerName)
+				httpClients, err = newCloudClientForService(ConfigServerName)
 				if err != nil {
 					if errors.Is(err, cfservices.MissingServiceError) {
 						return fmt.Errorf("neither %s or %s exist in environment variable 'VCAP_SERVICES'",
@@ -101,12 +101,11 @@ func DefaultCFService() Option {
 						return err
 					}
 				}
-				clients = append(clients, httpClients...)
 			} else {
 				return err
 			}
 		}
-		clients = append(clients, httpClients...)
+		*clients = append(*clients, httpClients...)
 		return nil
 	}
 }
@@ -115,12 +114,12 @@ func DefaultCFService() Option {
 // variable 'VCAP_SERVICES' provides a JSON. The JSON should contain the entry matching the specified name. This
 // entry and used to build an OAuth Client.
 func CFService(service string) Option {
-	return func(clients []*HTTPClient) error {
+	return func(clients *[]*HTTPClient) error {
 		httpClients, err := newCloudClientForService(service)
 		if err != nil {
 			return err
 		}
-		clients = append(clients, httpClients...)
+		*clients = append(*clients, httpClients...)
 		return nil
 	}
 }
@@ -147,8 +146,8 @@ func getCloudCredentials(name string) (*cfservices.ServiceCredentials, error) {
 
 // OAuth2 creates a Client for a Config Server based on the provided OAuth2.0 information.
 func OAuth2(baseURL string, clientId string, secret string, tokenURI string) Option {
-	return func(clients []*HTTPClient) error {
-		clients = append(clients, &HTTPClient{BaseURL: baseURL, Client: newOAuth2Client(clientId, secret, tokenURI)})
+	return func(clients *[]*HTTPClient) error {
+		*clients = append(*clients, &HTTPClient{BaseURL: baseURL, Client: newOAuth2Client(clientId, secret, tokenURI)})
 		return nil
 	}
 }
