@@ -12,6 +12,7 @@ import (
 	"strings"
 )
 
+// HTTPClient is a wrapper for http.Client.
 type HTTPClient struct {
 	BaseURL string
 	Client  *http.Client
@@ -19,6 +20,8 @@ type HTTPClient struct {
 
 var notFoundError = errors.New("failed to find resource")
 
+// GetResource performs a http.MethodGet operation. Builds the URL based on the provided paths and params. Deserializes
+// the response to the specified destination.
 func (h *HTTPClient) GetResource(paths []string, params map[string]string, dest interface{}) error {
 	resp, err := h.Get(paths, params)
 	if err != nil {
@@ -48,6 +51,7 @@ func (h *HTTPClient) GetResource(paths []string, params map[string]string, dest 
 	return nil
 }
 
+// Get performs a http.MethodGet operation. Builds the URL based on the provided paths and params.
 func (h *HTTPClient) Get(paths []string, params map[string]string) (*http.Response, error) {
 	fullUrl, err := newURL(h.BaseURL, paths, params)
 	if err != nil {
