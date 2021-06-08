@@ -65,8 +65,10 @@ func newURL(baseURL string, paths []string, params map[string]string) (string, e
 	if err != nil {
 		return "", fmt.Errorf("failed to parse url %s: %w", baseURL, err)
 	}
-	for _, p := range paths {
-		parseUrl.Path = path.Join(parseUrl.Path, p)
+	if paths != nil {
+		for _, p := range paths {
+			parseUrl.Path = path.Join(parseUrl.Path, p)
+		}
 	}
 	if params != nil {
 		query := parseUrl.Query()
