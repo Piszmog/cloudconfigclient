@@ -44,12 +44,12 @@ func (h *HTTPClient) GetResource(paths []string, params map[string]string, dest 
 		if err = yaml.NewDecoder(resp.Body).Decode(dest); err != nil {
 			return fmt.Errorf("failed to decode response from url: %w", err)
 		}
-	} else if strings.Contains(paths[len(paths)-1], ".json") {
-		if err = json.NewDecoder(resp.Body).Decode(dest); err != nil {
-			return fmt.Errorf("failed to decode response from url: %w", err)
-		}
 	} else if strings.Contains(paths[len(paths)-1], ".xml") {
 		if err = xml.NewDecoder(resp.Body).Decode(dest); err != nil {
+			return fmt.Errorf("failed to decode response from url: %w", err)
+		}
+	} else {
+		if err = json.NewDecoder(resp.Body).Decode(dest); err != nil {
 			return fmt.Errorf("failed to decode response from url: %w", err)
 		}
 	}
