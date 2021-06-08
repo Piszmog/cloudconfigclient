@@ -2,7 +2,7 @@ package cloudconfigclient_test
 
 import (
 	"bytes"
-	"github.com/Piszmog/cloudconfigclient"
+	"github.com/Piszmog/cloudconfigclient/v2"
 	"github.com/stretchr/testify/mock"
 	"io/ioutil"
 	"net/http"

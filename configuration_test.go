@@ -2,7 +2,7 @@ package cloudconfigclient_test
 
 import (
 	"errors"
-	"github.com/Piszmog/cloudconfigclient"
+	"github.com/Piszmog/cloudconfigclient/v2"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/Piszmog/cloudconfigclient"
+	"github.com/Piszmog/cloudconfigclient/v2"
 	"log"
 	"strings"
 )

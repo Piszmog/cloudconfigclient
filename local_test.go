@@ -1,7 +1,7 @@
 package cloudconfigclient_test
 
 import (
-	"github.com/Piszmog/cloudconfigclient"
+	"github.com/Piszmog/cloudconfigclient/v2"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"os"
