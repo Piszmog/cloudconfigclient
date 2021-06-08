@@ -8,8 +8,9 @@ import (
 const (
 	defaultApplicationName    = "default"
 	defaultApplicationProfile = "default"
-	useDefaultLabel           = "useDefaultLabel=true"
 )
+
+var useDefaultLabel = map[string]string{"yseDefaultLabel": "true"}
 
 // Resource interface describes how to retrieve files from the Config Server.
 type Resource interface {
@@ -20,11 +21,12 @@ type Resource interface {
 // GetFile retrieves the specified file from the provided directory from the Config Server's default branch.
 //
 // The file will be deserialize into the specified interface type.
-func (c ConfigClient) GetFile(directory string, file string, interfaceType interface{}) error {
+func (c *ConfigClient) GetFile(directory string, file string, interfaceType interface{}) error {
 	fileFound := false
+	paths := []string{defaultApplicationName, defaultApplicationProfile, directory, file}
 	for _, client := range c.Clients {
-		if err := getResource(client, interfaceType, defaultApplicationName, defaultApplicationProfile, directory, file+"?"+useDefaultLabel); err != nil {
-			if errors.As(err, &notFoundErrorType) {
+		if err := client.getResource(paths, useDefaultLabel, interfaceType); err != nil {
+			if errors.As(err, &notFoundError) {
 				continue
 			}
 			return err
@@ -42,9 +44,10 @@ func (c ConfigClient) GetFile(directory string, file string, interfaceType inter
 // The file will be deserialize into the specified interface type.
 func (c *ConfigClient) GetFileFromBranch(branch string, directory string, file string, interfaceType interface{}) error {
 	fileFound := false
+	paths := []string{defaultApplicationName, defaultApplicationProfile, branch, directory, file}
 	for _, client := range c.Clients {
-		if err := getResource(client, interfaceType, defaultApplicationName, defaultApplicationProfile, branch, directory, file); err != nil {
-			if errors.As(err, &notFoundErrorType) {
+		if err := client.getResource(paths, nil, interfaceType); err != nil {
+			if errors.As(err, &notFoundError) {
 				continue
 			}
 			return err

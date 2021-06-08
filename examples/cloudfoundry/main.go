@@ -11,13 +11,13 @@ func main() {
 	// ensure you have set the environment variable 'VCAP_SERVICES' that contains the information to connect to the
 	// Config Server
 
-	client, err := cloudconfigclient.NewCloudClient()
+	client, err := cloudconfigclient.New(cloudconfigclient.DefaultCFService())
 	if err != nil {
 		log.Fatalln(err)
 	}
 
 	// load a config file
-	configuration, err := client.GetConfiguration("test-app", []string{"cloud"})
+	configuration, err := client.GetConfiguration("test-app", "cloud")
 	if err != nil {
 		log.Fatalln(err)
 	}
