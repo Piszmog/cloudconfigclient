@@ -27,9 +27,9 @@ package cloudconfigclient_test
 //	cloudClient := new(mockCloudClient)
 //	response := NewMockHttpResponse(200, testJSONFile)
 //	cloudClient.On("Get", []string{"default", "default", "directory", "file.json?useDefaultLabel=true"}).Return(response, nil)
-//	client := NewConfigClient(cloudClient)
+//	Client := NewConfigClient(cloudClient)
 //	var f file
-//	err := client.GetFile("directory", "file.json", &f)
+//	err := Client.GetFile("directory", "file.json", &f)
 //	assert.NoError(t, err)
 //	assert.Equal(t, "value", f.Example.Field)
 //}
@@ -38,9 +38,9 @@ package cloudconfigclient_test
 //	cloudClient := new(mockCloudClient)
 //	response := NewMockHttpResponse(200, testJSONFile)
 //	cloudClient.On("Get", []string{"default", "default", "directory", "file.yml?useDefaultLabel=true"}).Return(response, nil)
-//	client := NewConfigClient(cloudClient)
+//	Client := NewConfigClient(cloudClient)
 //	var f file
-//	err := client.GetFile("directory", "file.yml", &f)
+//	err := Client.GetFile("directory", "file.yml", &f)
 //	assert.NoError(t, err)
 //	assert.Equal(t, "value", f.Example.Field)
 //}
@@ -49,9 +49,9 @@ package cloudconfigclient_test
 //	cloudClient := new(mockCloudClient)
 //	response := NewMockHttpResponse(200, testJSONFile)
 //	cloudClient.On("Get", []string{"default", "default", "directory", "file.yaml?useDefaultLabel=true"}).Return(response, nil)
-//	client := NewConfigClient(cloudClient)
+//	Client := NewConfigClient(cloudClient)
 //	var f file
-//	err := client.GetFile("directory", "file.yaml", &f)
+//	err := Client.GetFile("directory", "file.yaml", &f)
 //	assert.NoError(t, err)
 //	assert.Equal(t, "value", f.Example.Field)
 //}
@@ -61,9 +61,9 @@ package cloudconfigclient_test
 //	response := NewMockHttpResponse(404, "")
 //	cloudClient.On("Get", []string{"default", "default", "directory", "file.json?useDefaultLabel=true"}).
 //		Return(response, nil)
-//	client := NewConfigClient(cloudClient)
+//	Client := NewConfigClient(cloudClient)
 //	var f file
-//	err := client.GetFile("directory", "file.json", &f)
+//	err := Client.GetFile("directory", "file.json", &f)
 //	assert.Error(t, err)
 //	assert.Empty(t, f.Example.Field)
 //}
@@ -73,9 +73,9 @@ package cloudconfigclient_test
 //	response := NewMockHttpResponse(500, "")
 //	cloudClient.On("Get", []string{"default", "default", "directory", "file.json?useDefaultLabel=true"}).
 //		Return(response, errors.New("failed"))
-//	client := NewConfigClient(cloudClient)
+//	Client := NewConfigClient(cloudClient)
 //	var f file
-//	err := client.GetFile("directory", "file.json", &f)
+//	err := Client.GetFile("directory", "file.json", &f)
 //	assert.Error(t, err)
 //	assert.Empty(t, f.Example.Field)
 //}
@@ -85,9 +85,9 @@ package cloudconfigclient_test
 //	response := NewMockHttpResponse(500, "")
 //	cloudClient.On("Get", []string{"default", "default", "directory", "file.json?useDefaultLabel=true"}).
 //		Return(response, nil)
-//	client := NewConfigClient(cloudClient)
+//	Client := NewConfigClient(cloudClient)
 //	var file file
-//	err := client.GetFile("directory", "file.json", &file)
+//	err := Client.GetFile("directory", "file.json", &file)
 //	assert.Error(t, err)
 //	assert.Empty(t, file.Example.Field)
 //}
@@ -97,9 +97,9 @@ package cloudconfigclient_test
 //	response := NewMockHttpResponse(200, "")
 //	cloudClient.On("Get", []string{"default", "default", "directory", "file.json?useDefaultLabel=true"}).
 //		Return(response, nil)
-//	client := NewConfigClient(cloudClient)
+//	Client := NewConfigClient(cloudClient)
 //	var file file
-//	err := client.GetFile("directory", "file.json", &file)
+//	err := Client.GetFile("directory", "file.json", &file)
 //	assert.Error(t, err)
 //	assert.Empty(t, file.Example.Field)
 //}
@@ -109,9 +109,9 @@ package cloudconfigclient_test
 //	response := NewMockHttpResponse(200, testJSONFile)
 //	cloudClient.On("Get", []string{"default", "default", "branch", "directory", "file.json"}).
 //		Return(response, nil)
-//	client := NewConfigClient(cloudClient)
+//	Client := NewConfigClient(cloudClient)
 //	var f file
-//	err := client.GetFileFromBranch("branch", "directory", "file.json", &f)
+//	err := Client.GetFileFromBranch("branch", "directory", "file.json", &f)
 //	assert.NoError(t, err)
 //	assert.Equal(t, "value", f.Example.Field)
 //}
@@ -121,9 +121,9 @@ package cloudconfigclient_test
 //	response := NewMockHttpResponse(404, "")
 //	cloudClient.On("Get", []string{"default", "default", "branch", "directory", "file.json"}).
 //		Return(response, nil)
-//	client := NewConfigClient(cloudClient)
+//	Client := NewConfigClient(cloudClient)
 //	var f file
-//	err := client.GetFileFromBranch("branch", "directory", "file.json", &f)
+//	err := Client.GetFileFromBranch("branch", "directory", "file.json", &f)
 //	assert.Error(t, err)
 //	assert.Empty(t, f.Example.Field)
 //}
@@ -133,9 +133,9 @@ package cloudconfigclient_test
 //	response := NewMockHttpResponse(500, "")
 //	cloudClient.On("Get", []string{"default", "default", "branch", "directory", "file.json"}).
 //		Return(response, errors.New("failed"))
-//	client := NewConfigClient(cloudClient)
+//	Client := NewConfigClient(cloudClient)
 //	var f file
-//	err := client.GetFileFromBranch("branch", "directory", "file.json", &f)
+//	err := Client.GetFileFromBranch("branch", "directory", "file.json", &f)
 //	assert.Error(t, err)
 //	assert.Empty(t, f.Example.Field)
 //}
@@ -145,9 +145,9 @@ package cloudconfigclient_test
 //	response := NewMockHttpResponse(500, "")
 //	cloudClient.On("Get", []string{"default", "default", "branch", "directory", "file.json"}).
 //		Return(response, nil)
-//	client := NewConfigClient(cloudClient)
+//	Client := NewConfigClient(cloudClient)
 //	var f file
-//	err := client.GetFileFromBranch("branch", "directory", "file.json", &f)
+//	err := Client.GetFileFromBranch("branch", "directory", "file.json", &f)
 //	assert.Error(t, err)
 //	assert.Empty(t, f.Example.Field)
 //}
@@ -157,9 +157,9 @@ package cloudconfigclient_test
 //	response := NewMockHttpResponse(200, "")
 //	cloudClient.On("Get", []string{"default", "default", "branch", "directory", "file.json"}).
 //		Return(response, nil)
-//	client := NewConfigClient(cloudClient)
+//	Client := NewConfigClient(cloudClient)
 //	var f file
-//	err := client.GetFileFromBranch("branch", "directory", "file.json", &f)
+//	err := Client.GetFileFromBranch("branch", "directory", "file.json", &f)
 //	assert.Error(t, err)
 //	assert.Empty(t, f.Example.Field)
 //}

@@ -13,8 +13,8 @@ import (
 )
 
 type HTTPClient struct {
-	baseURL string
-	client  *http.Client
+	BaseURL string
+	Client  *http.Client
 }
 
 var notFoundError = errors.New("failed to find resource")
@@ -49,11 +49,11 @@ func (h *HTTPClient) GetResource(paths []string, params map[string]string, dest 
 }
 
 func (h *HTTPClient) Get(paths []string, params map[string]string) (*http.Response, error) {
-	fullUrl, err := newURL(h.baseURL, paths, params)
+	fullUrl, err := newURL(h.BaseURL, paths, params)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create url: %w", err)
 	}
-	response, err := h.client.Get(fullUrl)
+	response, err := h.Client.Get(fullUrl)
 	if err != nil {
 		return nil, fmt.Errorf("failed to retrieve from %s: %w", fullUrl, err)
 	}

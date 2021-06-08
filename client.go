@@ -77,7 +77,7 @@ func Local(client *http.Client, urls []string) Option {
 func newLocalClient(client *http.Client, urls []string) []*HTTPClient {
 	clients := make([]*HTTPClient, len(urls), len(urls))
 	for index, baseUrl := range urls {
-		clients[index] = &HTTPClient{baseURL: baseUrl, client: client}
+		clients[index] = &HTTPClient{BaseURL: baseUrl, Client: client}
 	}
 	return clients
 }
@@ -113,7 +113,7 @@ func DefaultCFService() Option {
 
 // CFService creates a clients for each Config Servers the application is bounded to in Cloud Foundry. The environment
 // variable 'VCAP_SERVICES' provides a JSON. The JSON should contain the entry matching the specified name. This
-// entry and used to build an OAuth client.
+// entry and used to build an OAuth Client.
 func CFService(service string) Option {
 	return func(clients []*HTTPClient) error {
 		httpClients, err := newCloudClientForService(service)
@@ -128,11 +128,11 @@ func CFService(service string) Option {
 func newCloudClientForService(name string) ([]*HTTPClient, error) {
 	creds, err := getCloudCredentials(name)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create cloud client: %w", err)
+		return nil, fmt.Errorf("failed to create cloud Client: %w", err)
 	}
 	clients := make([]*HTTPClient, len(creds.Credentials), len(creds.Credentials))
 	for i, cred := range creds.Credentials {
-		clients[i] = &HTTPClient{baseURL: cred.Uri, client: newOAuth2Client(cred.ClientId, cred.ClientSecret, cred.AccessTokenUri)}
+		clients[i] = &HTTPClient{BaseURL: cred.Uri, Client: newOAuth2Client(cred.ClientId, cred.ClientSecret, cred.AccessTokenUri)}
 	}
 	return clients, nil
 }
@@ -145,10 +145,10 @@ func getCloudCredentials(name string) (*cfservices.ServiceCredentials, error) {
 	return serviceCreds, nil
 }
 
-// OAuth2 creates a client for a Config Server based on the provided OAuth2.0 information.
+// OAuth2 creates a Client for a Config Server based on the provided OAuth2.0 information.
 func OAuth2(baseURL string, clientId string, secret string, tokenURI string) Option {
 	return func(clients []*HTTPClient) error {
-		clients = append(clients, &HTTPClient{baseURL: baseURL, client: newOAuth2Client(clientId, secret, tokenURI)})
+		clients = append(clients, &HTTPClient{BaseURL: baseURL, Client: newOAuth2Client(clientId, secret, tokenURI)})
 		return nil
 	}
 }

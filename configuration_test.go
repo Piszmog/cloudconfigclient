@@ -30,8 +30,8 @@ package cloudconfigclient_test
 //	mockClient := new(mockCloudClient)
 //	response := NewMockHttpResponse(200, configurationSource)
 //	mockClient.On("Get", []string{"appName", "profile"}).Return(response, nil)
-//	client := NewConfigClient(mockClient)
-//	_, err := client.GetConfiguration("appName", []string{"profile"})
+//	Client := NewConfigClient(mockClient)
+//	_, err := Client.GetConfiguration("appName", []string{"profile"})
 //	assert.NoError(t, err, "failed to retrieve configurations with error")
 //}
 //
@@ -39,8 +39,8 @@ package cloudconfigclient_test
 //	mockClient := new(mockCloudClient)
 //	response := NewMockHttpResponse(404, "")
 //	mockClient.On("Get", []string{"appName", "profile"}).Return(response, nil)
-//	client := NewConfigClient(mockClient)
-//	_, err := client.GetConfiguration("appName", []string{"profile"})
+//	Client := NewConfigClient(mockClient)
+//	_, err := Client.GetConfiguration("appName", []string{"profile"})
 //	assert.Error(t, err)
 //}
 //
@@ -48,8 +48,8 @@ package cloudconfigclient_test
 //	mockClient := new(mockCloudClient)
 //	response := NewMockHttpResponse(500, configurationSource)
 //	mockClient.On("Get", []string{"appName", "profile"}).Return(response, errors.New("failed"))
-//	client := NewConfigClient(mockClient)
-//	_, err := client.GetConfiguration("appName", []string{"profile"})
+//	Client := NewConfigClient(mockClient)
+//	_, err := Client.GetConfiguration("appName", []string{"profile"})
 //	assert.Error(t, err)
 //}
 //
@@ -57,8 +57,8 @@ package cloudconfigclient_test
 //	mockClient := new(mockCloudClient)
 //	response := NewMockHttpResponse(500, configurationSource)
 //	mockClient.On("Get", []string{"appName", "profile"}).Return(response, nil)
-//	client := NewConfigClient(mockClient)
-//	_, err := client.GetConfiguration("appName", []string{"profile"})
+//	Client := NewConfigClient(mockClient)
+//	_, err := Client.GetConfiguration("appName", []string{"profile"})
 //	assert.Error(t, err)
 //}
 //
@@ -66,8 +66,8 @@ package cloudconfigclient_test
 //	mockClient := new(mockCloudClient)
 //	response := NewMockHttpResponse(200, "")
 //	mockClient.On("Get", []string{"appName", "profile"}).Return(response, nil)
-//	client := NewConfigClient(mockClient)
-//	_, err := client.GetConfiguration("appName", []string{"profile"})
+//	Client := NewConfigClient(mockClient)
+//	_, err := Client.GetConfiguration("appName", []string{"profile"})
 //	assert.Error(t, err)
 //}
 //

@@ -12,7 +12,7 @@ func (f RoundTripFunc) RoundTrip(req *http.Request) (*http.Response, error) {
 	return f(req), nil
 }
 
-// NewMockHttpClient creates a mocked HTTP client
+// NewMockHttpClient creates a mocked HTTP Client
 func NewMockHttpClient(fn RoundTripFunc) *http.Client {
 	return &http.Client{
 		Transport: fn,
