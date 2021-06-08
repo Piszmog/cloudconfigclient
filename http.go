@@ -15,8 +15,8 @@ import (
 
 // HTTPClient is a wrapper for http.Client.
 type HTTPClient struct {
+	*http.Client
 	BaseURL string
-	Client  *http.Client
 }
 
 var notFoundError = errors.New("failed to find resource")
