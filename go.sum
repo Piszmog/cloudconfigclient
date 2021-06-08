@@ -35,6 +35,8 @@ github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/Piszmog/cfservices v1.4.3 h1:Ep2VrJ1c04qfDGv4klfCterPFTPv+3tVLQV5fcVy8uw=
 github.com/Piszmog/cfservices v1.4.3/go.mod h1:5SDyIoLVCxgkJhmB/ZFYbZ4yu3OEU5K78HseD8uFijE=
+github.com/Piszmog/cloudconfigclient v1.7.3 h1:dsmxyao9QG2rV1RqlyXjrpucb9W8R/+HPEAiFRGrCD4=
+github.com/Piszmog/cloudconfigclient v1.7.3/go.mod h1:dMcXsNU5RaR7iYFjy3VU+s+Y6z+4H00ZoQAUodLUfTo=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/chzyer/logex v1.1.10/go.mod h1:+Ywpsq7O8HXn0nuIou7OrIPyXbp3wmkHB+jjWRnGsAI=
 github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e/go.mod h1:nSuG5e5PlCu98SY8svDHJxuZscDgtXS6KTTbou5AhLI=
