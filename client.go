@@ -22,10 +22,14 @@ const (
 
 // ConfigClient contains the clients of the Config Servers.
 type ConfigClient struct {
-	// Clients are all the config server clients.
+	// Clients are the HTTP clients per Config Server instance.
 	Clients []*httpClient
 }
 
+// New creates a new ConfigClient based on the provided options. A ConfigClient can be configured to communicate with
+// a local Config Server, an OAuth2 Server, and Config Servers in Cloud Foundry.
+//
+// At least one option must be provided.
 func New(options ...Option) (*ConfigClient, error) {
 	var clients []*httpClient
 	if len(options) == 0 {
@@ -39,8 +43,11 @@ func New(options ...Option) (*ConfigClient, error) {
 	return &ConfigClient{Clients: clients}, nil
 }
 
+// Option creates a slice of httpClients per Config Server instance.
 type Option func([]*httpClient) error
 
+// LocalEnv creates a clients for a locally running Config Servers. The URLs to the Config Servers are acquired from the
+// environment variable 'CONFIG_SERVER_URLS'.
 func LocalEnv(client *http.Client) Option {
 	return func(clients []*httpClient) error {
 		httpClients, err := newLocalClientFromEnv(client)
@@ -60,6 +67,7 @@ func newLocalClientFromEnv(client *http.Client) ([]*httpClient, error) {
 	return newLocalClient(client, strings.Split(localUrls, ",")), nil
 }
 
+// Local creates a clients for a locally running Config Servers.
 func Local(client *http.Client, urls []string) Option {
 	return func(clients []*httpClient) error {
 		clients = append(clients, newLocalClient(client, urls)...)
@@ -75,6 +83,11 @@ func newLocalClient(client *http.Client, urls []string) []*httpClient {
 	return clients
 }
 
+// DefaultCFService creates a clients for each Config Servers the application is bounded to in Cloud Foundry. The
+// environment variable 'VCAP_SERVICES' provides a JSON that contains an entry with the key 'p-config-server' (v2.x)
+// or 'p.config-server' (v3.x).
+//
+// The service 'p.config-server' is search for first. If not found, 'p-config-server' is searched for.
 func DefaultCFService() Option {
 	return func(clients []*httpClient) error {
 		httpClients, err := newCloudClientForService(SpringCloudConfigServerName)
@@ -99,6 +112,9 @@ func DefaultCFService() Option {
 	}
 }
 
+// CFService creates a clients for each Config Servers the application is bounded to in Cloud Foundry. The environment
+// variable 'VCAP_SERVICES' provides a JSON. The JSON should contain the entry matching the specified name. This
+// entry and used to build an OAuth client.
 func CFService(service string) Option {
 	return func(clients []*httpClient) error {
 		httpClients, err := newCloudClientForService(service)
@@ -130,6 +146,7 @@ func getCloudCredentials(name string) (*cfservices.ServiceCredentials, error) {
 	return serviceCreds, nil
 }
 
+// OAuth2 creates a client for a Config Server based on the provided OAuth2.0 information.
 func OAuth2(baseURL string, clientId string, secret string, tokenURI string) Option {
 	return func(clients []*httpClient) error {
 		clients = append(clients, &httpClient{baseURL: baseURL, client: newOAuth2Client(clientId, secret, tokenURI)})
