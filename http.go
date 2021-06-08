@@ -28,7 +28,7 @@ func (h *HTTPClient) GetResource(paths []string, params map[string]string, dest 
 	if err != nil {
 		return err
 	}
-	defer closeResource(resp.Body)
+	defer resp.Body.Close()
 	if resp.StatusCode == http.StatusNotFound {
 		return notFoundError
 	}
@@ -63,7 +63,7 @@ func (h *HTTPClient) GetResourceRaw(paths []string, params map[string]string) ([
 	if err != nil {
 		return nil, err
 	}
-	defer closeResource(resp.Body)
+	defer resp.Body.Close()
 	if resp.StatusCode == http.StatusNotFound {
 		return nil, notFoundError
 	}
