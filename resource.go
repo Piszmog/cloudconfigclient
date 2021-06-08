@@ -10,7 +10,7 @@ const (
 	defaultApplicationProfile = "default"
 )
 
-var useDefaultLabel = map[string]string{"yseDefaultLabel": "true"}
+var useDefaultLabel = map[string]string{"useDefaultLabel": "true"}
 
 // Resource interface describes how to retrieve files from the Config Server.
 type Resource interface {
