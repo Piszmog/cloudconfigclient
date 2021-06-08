@@ -32,6 +32,7 @@ func TestClient_GetConfiguration(t *testing.T) {
 		name        string
 		application string
 		profiles    []string
+		checker     func(*testing.T, *http.Request)
 		response    *http.Response
 		expected    cloudconfigclient.Source
 		err         error
@@ -40,7 +41,24 @@ func TestClient_GetConfiguration(t *testing.T) {
 			name:        "Get Config",
 			application: "appName",
 			profiles:    []string{"profile"},
-			response:    NewMockHttpResponse(http.StatusOK, configurationSource),
+			checker: func(t *testing.T, request *http.Request) {
+				require.Equal(t, "http://localhost:8888/appName/profile", request.URL.String())
+			},
+			response: NewMockHttpResponse(http.StatusOK, configurationSource),
+			expected: cloudconfigclient.Source{
+				Name:            "testConfig",
+				Profiles:        []string{"profile"},
+				PropertySources: []cloudconfigclient.PropertySource{{Name: "test", Source: map[string]interface{}{"field1": "value1", "field2": float64(1)}}},
+			},
+		},
+		{
+			name:        "Multiple Profiles",
+			application: "appName",
+			profiles:    []string{"profile1", "profile2", "profile3"},
+			checker: func(t *testing.T, request *http.Request) {
+				require.Equal(t, "http://localhost:8888/appName/profile1,profile2,profile3", request.URL.String())
+			},
+			response: NewMockHttpResponse(http.StatusOK, configurationSource),
 			expected: cloudconfigclient.Source{
 				Name:            "testConfig",
 				Profiles:        []string{"profile"},
@@ -78,6 +96,9 @@ func TestClient_GetConfiguration(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			httpClient := NewMockHttpClient(func(req *http.Request) *http.Response {
+				if test.checker != nil {
+					test.checker(t, req)
+				}
 				return test.response
 			})
 			client, err := cloudconfigclient.New(cloudconfigclient.Local(httpClient, "http://localhost:8888"))
