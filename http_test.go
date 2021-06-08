@@ -102,10 +102,147 @@ func TestHTTPClient_Get(t *testing.T) {
 			httpClient := cloudconfigclient.HTTPClient{BaseURL: test.baseURL, Client: client}
 			_, err := httpClient.Get(test.paths, test.params)
 			if err != nil {
+				require.Error(t, err)
 				require.Equal(t, test.err.Error(), err.Error())
 			} else {
 				require.NoError(t, err)
 			}
 		})
 	}
+}
+
+func TestHTTPClient_GetResource(t *testing.T) {
+	tests := []struct {
+		name        string
+		paths       []string
+		params      map[string]string
+		destination interface{}
+		response    *http.Response
+		expected    interface{}
+		err         error
+	}{
+		{
+			name: "HTTP Error",
+			err:  errors.New("failed to retrieve from http://something: Get \"http://something\": http: RoundTripper implementation (cloudconfigclient_test.RoundTripFunc) returned a nil *Response with a nil error"),
+		},
+		{
+			name:     "Not Found",
+			response: NewMockHttpResponse(http.StatusNotFound, ""),
+			err:      errors.New("failed to find resource"),
+		},
+		{
+			name:     "Internal Server Error",
+			response: NewMockHttpResponse(http.StatusInternalServerError, "Invalid HTTP Call"),
+			err:      errors.New("server responded with status code '500' and body 'Invalid HTTP Call'"),
+		},
+		{
+			name: "HTTP Error",
+			err:  errors.New("failed to retrieve from http://something: Get \"http://something\": http: RoundTripper implementation (cloudconfigclient_test.RoundTripFunc) returned a nil *Response with a nil error"),
+		},
+		{
+			name:        "YAML Response",
+			paths:       []string{"file.yaml"},
+			params:      map[string]string{"useDefault": "true"},
+			destination: make(map[string]interface{}),
+			response:    NewMockHttpResponse(http.StatusOK, `foo: bar`),
+			expected:    map[string]interface{}{"foo": "bar"},
+		},
+		{
+			name:        "YML Response",
+			paths:       []string{"file.yml"},
+			params:      map[string]string{"useDefault": "true"},
+			destination: make(map[string]interface{}),
+			response:    NewMockHttpResponse(http.StatusOK, `foo: bar`),
+			expected:    map[string]interface{}{"foo": "bar"},
+		},
+		{
+			name:        "JSON Response",
+			paths:       []string{"file.json"},
+			params:      map[string]string{"useDefault": "true"},
+			destination: make(map[string]interface{}),
+			response:    NewMockHttpResponse(http.StatusOK, `{"foo":"bar"}`),
+			expected:    map[string]interface{}{"foo": "bar"},
+		},
+		{
+			name:        "XML Response",
+			paths:       []string{"file.xml"},
+			params:      map[string]string{"useDefault": "true"},
+			destination: new(xmlResp),
+			response:    NewMockHttpResponse(http.StatusOK, `"<data><foo>bar</foo></data>"`),
+			expected:    &xmlResp{Foo: "bar"},
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			client := NewMockHttpClient(func(req *http.Request) *http.Response {
+				return test.response
+			})
+			httpClient := cloudconfigclient.HTTPClient{BaseURL: "http://something", Client: client}
+			err := httpClient.GetResource(test.paths, test.params, &test.destination)
+			if err != nil {
+				require.Error(t, err)
+				require.Equal(t, test.err.Error(), err.Error())
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, test.expected, test.destination)
+			}
+		})
+	}
+}
+
+func TestHTTPClient_GetResourceRaw(t *testing.T) {
+	tests := []struct {
+		name     string
+		paths    []string
+		params   map[string]string
+		response *http.Response
+		expected []byte
+		err      error
+	}{
+		{
+			name: "HTTP Error",
+			err:  errors.New("failed to retrieve from http://something: Get \"http://something\": http: RoundTripper implementation (cloudconfigclient_test.RoundTripFunc) returned a nil *Response with a nil error"),
+		},
+		{
+			name:     "Not Found",
+			response: NewMockHttpResponse(http.StatusNotFound, ""),
+			err:      errors.New("failed to find resource"),
+		},
+		{
+			name:     "Internal Server Error",
+			response: NewMockHttpResponse(http.StatusInternalServerError, "Invalid HTTP Call"),
+			err:      errors.New("server responded with status code '500' and body 'Invalid HTTP Call'"),
+		},
+		{
+			name: "HTTP Error",
+			err:  errors.New("failed to retrieve from http://something: Get \"http://something\": http: RoundTripper implementation (cloudconfigclient_test.RoundTripFunc) returned a nil *Response with a nil error"),
+		},
+		{
+			name:     "Text Response",
+			paths:    []string{"file.text"},
+			params:   map[string]string{"useDefault": "true"},
+			response: NewMockHttpResponse(http.StatusOK, `foo-bar`),
+			expected: []byte("foo-bar"),
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			client := NewMockHttpClient(func(req *http.Request) *http.Response {
+				return test.response
+			})
+			httpClient := cloudconfigclient.HTTPClient{BaseURL: "http://something", Client: client}
+			resp, err := httpClient.GetResourceRaw(test.paths, test.params)
+			if err != nil {
+				require.Error(t, err)
+				require.Equal(t, test.err.Error(), err.Error())
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, test.expected, resp)
+			}
+		})
+	}
+}
+
+type xmlResp struct {
+	Foo string `xml:"foo"`
 }

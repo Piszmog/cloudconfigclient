@@ -2,6 +2,7 @@ package cloudconfigclient
 
 import (
 	"encoding/json"
+	"encoding/xml"
 	"errors"
 	"fmt"
 	"gopkg.in/yaml.v3"
@@ -35,20 +36,46 @@ func (h *HTTPClient) GetResource(paths []string, params map[string]string, dest 
 		var b []byte
 		b, err = ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return fmt.Errorf("failed to read body with status code %d: %w", resp.StatusCode, err)
+			return fmt.Errorf("failed to read body with status code '%d': %w", resp.StatusCode, err)
 		}
-		return fmt.Errorf("server responded with status code %d and body %s", resp.StatusCode, b)
+		return fmt.Errorf("server responded with status code '%d' and body '%s'", resp.StatusCode, b)
 	}
 	if strings.Contains(paths[len(paths)-1], ".yml") || strings.Contains(paths[len(paths)-1], ".yaml") {
 		if err = yaml.NewDecoder(resp.Body).Decode(dest); err != nil {
 			return fmt.Errorf("failed to decode response from url: %w", err)
 		}
-	} else {
+	} else if strings.Contains(paths[len(paths)-1], ".json") {
 		if err = json.NewDecoder(resp.Body).Decode(dest); err != nil {
+			return fmt.Errorf("failed to decode response from url: %w", err)
+		}
+	} else if strings.Contains(paths[len(paths)-1], ".xml") {
+		if err = xml.NewDecoder(resp.Body).Decode(dest); err != nil {
 			return fmt.Errorf("failed to decode response from url: %w", err)
 		}
 	}
 	return nil
+}
+
+// GetResourceRaw performs a http.MethodGet operation. Builds the URL based on the provided paths and params. Returns
+// the byte slice response.
+func (h *HTTPClient) GetResourceRaw(paths []string, params map[string]string) ([]byte, error) {
+	resp, err := h.Get(paths, params)
+	if err != nil {
+		return nil, err
+	}
+	defer closeResource(resp.Body)
+	if resp.StatusCode == http.StatusNotFound {
+		return nil, notFoundError
+	}
+	var b []byte
+	b, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read body with status code '%d': %w", resp.StatusCode, err)
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("server responded with status code '%d' and body '%s'", resp.StatusCode, b)
+	}
+	return b, nil
 }
 
 // Get performs a http.MethodGet operation. Builds the URL based on the provided paths and params.
