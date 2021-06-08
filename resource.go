@@ -21,7 +21,7 @@ type Resource interface {
 // GetFile retrieves the specified file from the provided directory from the Config Server's default branch.
 //
 // The file will be deserialize into the specified interface type.
-func (c *ConfigClient) GetFile(directory string, file string, interfaceType interface{}) error {
+func (c *Client) GetFile(directory string, file string, interfaceType interface{}) error {
 	fileFound := false
 	paths := []string{defaultApplicationName, defaultApplicationProfile, directory, file}
 	for _, client := range c.clients {
@@ -42,7 +42,7 @@ func (c *ConfigClient) GetFile(directory string, file string, interfaceType inte
 // GetFileFromBranch retrieves the specified file from the provided branch in the provided directory.
 //
 // The file will be deserialize into the specified interface type.
-func (c *ConfigClient) GetFileFromBranch(branch string, directory string, file string, interfaceType interface{}) error {
+func (c *Client) GetFileFromBranch(branch string, directory string, file string, interfaceType interface{}) error {
 	fileFound := false
 	paths := []string{defaultApplicationName, defaultApplicationProfile, branch, directory, file}
 	for _, client := range c.clients {

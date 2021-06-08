@@ -20,16 +20,16 @@ const (
 	SpringCloudConfigServerName = "p.config-server"
 )
 
-// ConfigClient contains the clients of the Config Servers.
-type ConfigClient struct {
+// Client contains the clients of the Config Servers.
+type Client struct {
 	clients []*httpClient
 }
 
-// New creates a new ConfigClient based on the provided options. A ConfigClient can be configured to communicate with
+// New creates a new Client based on the provided options. A Client can be configured to communicate with
 // a local Config Server, an OAuth2 Server, and Config Servers in Cloud Foundry.
 //
 // At least one option must be provided.
-func New(options ...Option) (*ConfigClient, error) {
+func New(options ...Option) (*Client, error) {
 	var clients []*httpClient
 	if len(options) == 0 {
 		return nil, errors.New("at least one option must be provided")
@@ -39,7 +39,7 @@ func New(options ...Option) (*ConfigClient, error) {
 			return nil, err
 		}
 	}
-	return &ConfigClient{clients: clients}, nil
+	return &Client{clients: clients}, nil
 }
 
 // Option creates a slice of httpClients per Config Server instance.

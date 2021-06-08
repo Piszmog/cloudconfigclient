@@ -67,7 +67,7 @@ type Configuration interface {
 
 // GetConfiguration retrieves the configurations/property sources of an application based on the name of the application
 // and the profiles of the application.
-func (c *ConfigClient) GetConfiguration(applicationName string, profiles ...string) (Source, error) {
+func (c *Client) GetConfiguration(applicationName string, profiles ...string) (Source, error) {
 	var source Source
 	paths := []string{applicationName, joinProfiles(profiles)}
 	for _, client := range c.clients {
