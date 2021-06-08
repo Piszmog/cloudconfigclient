@@ -125,11 +125,11 @@ func TestHTTPClient_GetResource(t *testing.T) {
 			name: "HTTP Error",
 			err:  errors.New("failed to retrieve from http://something: Get \"http://something\": http: RoundTripper implementation (cloudconfigclient_test.RoundTripFunc) returned a nil *Response with a nil error"),
 		},
-		{
-			name:     "Not Found",
-			response: NewMockHttpResponse(http.StatusNotFound, ""),
-			err:      errors.New("failed to find resource"),
-		},
+		//{
+		//	name:     "Not Found",
+		//	response: NewMockHttpResponse(http.StatusNotFound, ""),
+		//	err:      errors.New("failed to find resource"),
+		//},
 		{
 			name:     "Internal Server Error",
 			response: NewMockHttpResponse(http.StatusInternalServerError, "Invalid HTTP Call"),
@@ -226,11 +226,6 @@ func TestHTTPClient_GetResourceRaw(t *testing.T) {
 		{
 			name: "HTTP Error",
 			err:  errors.New("failed to retrieve from http://something: Get \"http://something\": http: RoundTripper implementation (cloudconfigclient_test.RoundTripFunc) returned a nil *Response with a nil error"),
-		},
-		{
-			name:     "Not Found",
-			response: NewMockHttpResponse(http.StatusNotFound, ""),
-			err:      errors.New("failed to find resource"),
 		},
 		{
 			name:     "Internal Server Error",
