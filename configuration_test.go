@@ -152,7 +152,7 @@ func TestSource_GetPropertySource(t *testing.T) {
 				assert.NoError(t, err)
 				assert.Equal(t, test.fileName, propertySource.Name)
 			} else {
-				assert.ErrorIs(t, err, cloudconfigclient.PropertySourceDoesNotExistErr)
+				assert.ErrorIs(t, err, cloudconfigclient.PropertySourceDoesNotExistError)
 			}
 		})
 	}

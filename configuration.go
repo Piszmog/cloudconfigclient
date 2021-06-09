@@ -29,12 +29,12 @@ func (s *Source) GetPropertySource(fileName string) (PropertySource, error) {
 			return propertySource, nil
 		}
 	}
-	return PropertySource{}, PropertySourceDoesNotExistErr
+	return PropertySource{}, PropertySourceDoesNotExistError
 }
 
-// PropertySourceDoesNotExistErr is the error that is returned when there are no PropertySource that match the specified
+// PropertySourceDoesNotExistError is the error that is returned when there are no PropertySource that match the specified
 // file name.
-var PropertySourceDoesNotExistErr = errors.New("property source does not exist")
+var PropertySourceDoesNotExistError = errors.New("property source does not exist")
 
 // PropertySourceHandler handles the specific PropertySource.
 type PropertySourceHandler func(propertySource PropertySource)
