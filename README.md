@@ -224,7 +224,10 @@ are, `GetFile(directory string, file string, interfaceType interface{})` and
 
 ### Spring Cloud Config Server v3.x Changes
 
-SCS v3.x slightly changed how files are retrieved. If the Config Server specified a directory in the `searchPaths`, the
+The following is only for certain versions of SCCS v3.x. If a file is not being found by the client, the following may
+be true.
+
+SCCS v3.x slightly changed how files are retrieved. If the Config Server specified a directory in the `searchPaths`, the
 path should be excluded from the `GetFile(..)` invocation.
 
 For example if `common` has been specified in the `searchPaths` and the file `common/foo.txt` needs to be retrieved,
