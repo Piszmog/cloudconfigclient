@@ -22,6 +22,10 @@ type HTTPClient struct {
 // ResourceNotFoundError is a special error that is used to propagate 404s.
 var ResourceNotFoundError = errors.New("failed to find resource")
 
+const (
+	failedToDecodeMessage = "failed to decode response from url: %w"
+)
+
 // GetResource performs a http.MethodGet operation. Builds the URL based on the provided paths and params. Deserializes
 // the response to the specified destination.
 //
@@ -48,15 +52,15 @@ func (h *HTTPClient) GetResource(paths []string, params map[string]string, dest 
 	}
 	if strings.Contains(paths[len(paths)-1], ".yml") || strings.Contains(paths[len(paths)-1], ".yaml") {
 		if err = yaml.NewDecoder(resp.Body).Decode(dest); err != nil {
-			return fmt.Errorf("failed to decode response from url: %w", err)
+			return fmt.Errorf(failedToDecodeMessage, err)
 		}
 	} else if strings.Contains(paths[len(paths)-1], ".xml") {
 		if err = xml.NewDecoder(resp.Body).Decode(dest); err != nil {
-			return fmt.Errorf("failed to decode response from url: %w", err)
+			return fmt.Errorf(failedToDecodeMessage, err)
 		}
 	} else {
 		if err = json.NewDecoder(resp.Body).Decode(dest); err != nil {
-			return fmt.Errorf("failed to decode response from url: %w", err)
+			return fmt.Errorf(failedToDecodeMessage, err)
 		}
 	}
 	return nil
