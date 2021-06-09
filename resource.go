@@ -27,10 +27,16 @@ type Resource interface {
 	GetFileFromBranchRaw(branch string, directory string, file string) ([]byte, error)
 }
 
+// GetFile retrieves the specified file from the provided directory from the Config Server's default branch.
+//
+// The file will be deserialize into the specified interface type.
 func (c *Client) GetFile(directory string, file string, interfaceType interface{}) error {
 	return c.getFile([]string{defaultApplicationName, defaultApplicationProfile, directory, file}, useDefaultLabel, interfaceType)
 }
 
+// GetFileFromBranch retrieves the specified file from the provided branch in the provided directory.
+//
+// The file will be deserialize into the specified interface type.
 func (c *Client) GetFileFromBranch(branch string, directory string, file string, interfaceType interface{}) error {
 	return c.getFile([]string{defaultApplicationName, defaultApplicationProfile, branch, directory, file}, nil, interfaceType)
 }
@@ -52,10 +58,12 @@ func (c *Client) getFile(paths []string, params map[string]string, interfaceType
 	return nil
 }
 
+// GetFileRaw retrieves the file from the default branch as a byte slice.
 func (c *Client) GetFileRaw(directory string, file string) ([]byte, error) {
 	return c.getFileRaw([]string{defaultApplicationName, defaultApplicationProfile, directory, file}, useDefaultLabel)
 }
 
+// GetFileFromBranchRaw retrieves the file from the specified branch as a byte slice.
 func (c *Client) GetFileFromBranchRaw(branch string, directory string, file string) ([]byte, error) {
 	return c.getFileRaw([]string{defaultApplicationName, defaultApplicationProfile, branch, directory, file}, nil)
 }
