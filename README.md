@@ -63,7 +63,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/Piszmog/cfservices"
 	"github.com/Piszmog/cloudconfigclient/v2"
 	"net/http"
 )
