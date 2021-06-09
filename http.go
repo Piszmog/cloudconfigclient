@@ -26,6 +26,9 @@ var notFoundError = errors.New("failed to find resource")
 //
 // Capable of unmarshalling YAML, JSON, and XML. If file type is of another type, use GetResourceRaw instead.
 func (h *HTTPClient) GetResource(paths []string, params map[string]string, dest interface{}) error {
+	if len(paths) == 0 {
+		return errors.New("no resource specified to be retrieved")
+	}
 	resp, err := h.Get(paths, params)
 	if err != nil {
 		return err
@@ -61,6 +64,9 @@ func (h *HTTPClient) GetResource(paths []string, params map[string]string, dest 
 // GetResourceRaw performs a http.MethodGet operation. Builds the URL based on the provided paths and params. Returns
 // the byte slice response.
 func (h *HTTPClient) GetResourceRaw(paths []string, params map[string]string) ([]byte, error) {
+	if len(paths) == 0 {
+		return nil, errors.New("no resource specified to be retrieved")
+	}
 	resp, err := h.Get(paths, params)
 	if err != nil {
 		return nil, err

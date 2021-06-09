@@ -218,6 +218,11 @@ func TestHTTPClient_GetResource(t *testing.T) {
 			},
 			err: errors.New("failed to read body with status code '500': failed"),
 		},
+		{
+			name:        "No Resource Specified",
+			destination: new(xmlResp),
+			err:         errors.New("no resource specified to be retrieved"),
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -278,6 +283,10 @@ func TestHTTPClient_GetResourceRaw(t *testing.T) {
 				Header: make(http.Header),
 			},
 			err: errors.New("failed to read body with status code '200': failed"),
+		},
+		{
+			name: "No Resource Specified",
+			err:  errors.New("no resource specified to be retrieved"),
 		},
 	}
 	for _, test := range tests {
