@@ -15,8 +15,8 @@ library [Cloud Config Client](https://github.com/Piszmog/cloud-config-client).
 
 #### V2 Migration
 
-See [V2 Migration](https://github.com/Piszmog/cloudconfigclient/wiki/V2-Migration) for details on how to migrate from
-  V1 to V2
+See [V2 Migration](https://github.com/Piszmog/cloudconfigclient/wiki/V2-Migration) for details on how to migrate from V1
+to V2
 
 ## Description
 
@@ -37,9 +37,9 @@ branch.
 Since Spring Cloud Services v3.0, the service name in `VCAP_SERVICES` has changed from `p-config-server` to
 be `p.config-server`.
 
-To help mitigate migration difficulties, `cloudconfigclient.NewCloudClient()` will first search for the
-service `p-config-server` (v2.x). If the v2.x service could not be found,
-`p.config-server` (v3.x) will be search for.
+To help mitigate migration difficulties, `cloudconfigclient.New(cloudconfigclient.DefaultCFService())` will first search
+for the service `p.config-server` (v3.x). If the v3.x service could not be found,
+`p-config-server` (v2.x) will be search for.
 
 See [Spring Cloud Services Differences](https://docs.pivotal.io/spring-cloud-services/3-1/common/config-server/managing-service-instances.html#differences-between-3-0-and-earlier)
 for more details.
@@ -49,14 +49,14 @@ for more details.
 Below is an example usage of the library to retrieve a file from the Config Server and to retrieve the application's
 configurations
 
-* For local config client, there are two ways the create a client
-    1. Call `NewLocalClientFromEnv()`. Set the environment variable `CONFIG_SERVER_URLS`. It is a comma separated list
-       of all the base URLs
-    2. Call `NewLocalClient(baseUrls []string)`. Provide the array of base URLs of Config Servers.
+* For local config client, there are two options (`Option`) the create a client
+    1. Call `LocalEnv()`. Set the environment variable `CONFIG_SERVER_URLS`. It is a comma separated list of all the
+       base URLs
+    2. Call `Local(baseUrls ...string)`. Provide the array of base URLs of Config Servers.
 * For running in Cloud Foundry, ensure a Config Server is bounded to the application. `VCAP_SERVICES` will be provided
   as an environment variables with the credentials to access the Config Server
 * For connecting to a Config Server via OAuth2 and not deployed to Cloud Foundry, an OAuth2 Client can be created
-  with `NewOAuth2Client(credentials []cfservices.Credentials)`
+  with `OAuth2(baseURL string, clientId string, secret string, tokenURI string)`
 
 ```go
 package main
@@ -78,35 +78,46 @@ type Example struct {
 
 func main() {
 	// To create a Client for a locally running Spring Config Server
-	configClient, err := cloudconfigclient.NewLocalClientFromEnv(&http.Client{})
+	configClient, err := cloudconfigclient.New(cloudconfigclient.LocalEnv(&http.Client{}))
 	// Or
-	configClient, err := cloudconfigclient.NewLocalClient(&http.Client{}, []string{"http://localhost:8888"})
+	configClient, err := cloudconfigclient.New(cloudconfigclient.Local(&http.Client{}, "http://localhost:8888"))
 	// or to create a Client for a Spring Config Server in Cloud Foundry
-	configClient, err := cloudconfigclient.NewCloudClient()
+	configClient, err := cloudconfigclient.New(cloudconfigclient.DefaultCFService())
 	// or to create a Client for a Spring Config Server with OAuth2
-	credentials := cfservices.Credentials{
-		Uri:            "config server uri",
-		ClientSecret:   "client secret",
-		ClientId:       "client id",
-		AccessTokenUri: "access token uri",
-	}
-	configClient, err := cloudconfigclient.NewOAuth2Client([]cfservices.Credentials{credentials})
+	configClient, err := cloudconfigclient.New(cloudconfigclient.OAuth2("config server uri", "client id", "client secret",
+		"access token uri"))
+	// or a combination of local, Cloud Foundry, and OAuth2
+	configClient, err := cloudconfigclient.New(
+		cloudconfigclient.Local(&http.Client{}, "http://localhost:8888"),
+		cloudconfigclient.DefaultCFService(),
+		cloudconfigclient.OAuth2("config server uri", "client id", "client secret", "access token uri"),
+	)
 
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		return
 	}
 	var file File
 	// Retrieves a 'temp1.json' from the Config Server's default branch in directory 'temp' and deserialize to File
 	err = configClient.GetFile("temp", "temp1.json", &file)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		return
 	}
 	fmt.Printf("%+v\n", file)
+	// Retrieves a 'temp2.txt' from the Config Server's default branch in directory 'temp' as a byte slice ([]byte)
+	b, err := configClient.GetFileRaw("temp", "temp1.json")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(string(b))
 
 	// Retrieves the configurations from the Config Server based on the application name and active profiles
-	config, err := configClient.GetConfiguration("testApp", []string{"dev"})
+	config, err := configClient.GetConfiguration("testApp", "dev")
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		return
 	}
 	fmt.Printf("%+v", config)
 }
