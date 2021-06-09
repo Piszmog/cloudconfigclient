@@ -190,6 +190,34 @@ func TestHTTPClient_GetResource(t *testing.T) {
 			response:    NewMockHttpResponse(http.StatusOK, `"<data><foo>bar</foo></data"`),
 			err:         errors.New("failed to decode response from url: XML syntax error on line 1: invalid characters between </data and >"),
 		},
+		{
+			name:        "Read Error",
+			paths:       []string{"file.yml"},
+			params:      map[string]string{"useDefault": "true"},
+			destination: new(xmlResp),
+			response: &http.Response{
+				StatusCode: http.StatusOK,
+				// Send response to be tested
+				Body: errorReader{},
+				// Must be set to non-nil value or it panics
+				Header: make(http.Header),
+			},
+			err: errors.New("failed to decode response from url: yaml: input error: failed"),
+		},
+		{
+			name:        "Internal Error Read Error",
+			paths:       []string{"file.yml"},
+			params:      map[string]string{"useDefault": "true"},
+			destination: new(xmlResp),
+			response: &http.Response{
+				StatusCode: http.StatusInternalServerError,
+				// Send response to be tested
+				Body: errorReader{},
+				// Must be set to non-nil value or it panics
+				Header: make(http.Header),
+			},
+			err: errors.New("failed to read body with status code '500': failed"),
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -238,6 +266,19 @@ func TestHTTPClient_GetResourceRaw(t *testing.T) {
 			response: NewMockHttpResponse(http.StatusOK, `foo-bar`),
 			expected: []byte("foo-bar"),
 		},
+		{
+			name:   "Read Error",
+			paths:  []string{"file.text"},
+			params: map[string]string{"useDefault": "true"},
+			response: &http.Response{
+				StatusCode: http.StatusOK,
+				// Send response to be tested
+				Body: errorReader{},
+				// Must be set to non-nil value or it panics
+				Header: make(http.Header),
+			},
+			err: errors.New("failed to read body with status code '200': failed"),
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -255,6 +296,17 @@ func TestHTTPClient_GetResourceRaw(t *testing.T) {
 			}
 		})
 	}
+}
+
+type errorReader struct {
+}
+
+func (e errorReader) Read(p []byte) (n int, err error) {
+	return 0, errors.New("failed")
+}
+
+func (e errorReader) Close() error {
+	return errors.New("failed")
 }
 
 type xmlResp struct {
