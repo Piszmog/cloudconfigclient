@@ -122,17 +122,15 @@ func TestHTTPClient_GetResource(t *testing.T) {
 		err         error
 	}{
 		{
-			name: "HTTP Error",
-			err:  errors.New("failed to retrieve from http://something: Get \"http://something\": http: RoundTripper implementation (cloudconfigclient_test.RoundTripFunc) returned a nil *Response with a nil error"),
+			name:  "HTTP Error",
+			paths: []string{"file.yaml"},
+			err:   errors.New("failed to retrieve from http://something/file.yaml: Get \"http://something/file.yaml\": http: RoundTripper implementation (cloudconfigclient_test.RoundTripFunc) returned a nil *Response with a nil error"),
 		},
 		{
 			name:     "Internal Server Error",
+			paths:    []string{"file.yaml"},
 			response: NewMockHttpResponse(http.StatusInternalServerError, "Invalid HTTP Call"),
 			err:      errors.New("server responded with status code '500' and body 'Invalid HTTP Call'"),
-		},
-		{
-			name: "HTTP Error",
-			err:  errors.New("failed to retrieve from http://something: Get \"http://something\": http: RoundTripper implementation (cloudconfigclient_test.RoundTripFunc) returned a nil *Response with a nil error"),
 		},
 		{
 			name:        "YAML Response",
@@ -252,17 +250,15 @@ func TestHTTPClient_GetResourceRaw(t *testing.T) {
 		err      error
 	}{
 		{
-			name: "HTTP Error",
-			err:  errors.New("failed to retrieve from http://something: Get \"http://something\": http: RoundTripper implementation (cloudconfigclient_test.RoundTripFunc) returned a nil *Response with a nil error"),
+			name:  "HTTP Error",
+			paths: []string{"file.text"},
+			err:   errors.New("failed to retrieve from http://something/file.text: Get \"http://something/file.text\": http: RoundTripper implementation (cloudconfigclient_test.RoundTripFunc) returned a nil *Response with a nil error"),
 		},
 		{
 			name:     "Internal Server Error",
+			paths:    []string{"file.text"},
 			response: NewMockHttpResponse(http.StatusInternalServerError, "Invalid HTTP Call"),
 			err:      errors.New("server responded with status code '500' and body 'Invalid HTTP Call'"),
-		},
-		{
-			name: "HTTP Error",
-			err:  errors.New("failed to retrieve from http://something: Get \"http://something\": http: RoundTripper implementation (cloudconfigclient_test.RoundTripFunc) returned a nil *Response with a nil error"),
 		},
 		{
 			name:     "Text Response",
