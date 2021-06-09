@@ -101,9 +101,8 @@ func DefaultCFService() Option {
 					if errors.Is(err, cfservices.MissingServiceError) {
 						return fmt.Errorf("neither %s or %s exist in environment variable 'VCAP_SERVICES'",
 							ConfigServerName, SpringCloudConfigServerName)
-					} else {
-						return err
 					}
+					return err
 				}
 			} else {
 				return err
