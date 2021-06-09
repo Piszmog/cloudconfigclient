@@ -72,7 +72,7 @@ func (c *Client) GetConfiguration(applicationName string, profiles ...string) (S
 	paths := []string{applicationName, joinProfiles(profiles)}
 	for _, client := range c.clients {
 		if err := client.GetResource(paths, nil, &source); err != nil {
-			if errors.Is(err, NotFoundError) {
+			if errors.Is(err, ResourceNotFoundError) {
 				continue
 			}
 			return Source{}, err
