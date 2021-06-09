@@ -50,16 +50,23 @@ func (h *HTTPClient) GetResource(paths []string, params map[string]string, dest 
 		}
 		return fmt.Errorf("server responded with status code '%d' and body '%s'", resp.StatusCode, b)
 	}
-	if strings.Contains(paths[len(paths)-1], ".yml") || strings.Contains(paths[len(paths)-1], ".yaml") {
-		if err = yaml.NewDecoder(resp.Body).Decode(dest); err != nil {
+	if err = decodeResponseBody(paths[len(paths)-1], resp, dest); err != nil {
+		return err
+	}
+	return nil
+}
+
+func decodeResponseBody(file string, resp *http.Response, dest interface{}) error {
+	if strings.Contains(file, ".yml") || strings.Contains(file, ".yaml") {
+		if err := yaml.NewDecoder(resp.Body).Decode(dest); err != nil {
 			return fmt.Errorf(failedToDecodeMessage, err)
 		}
-	} else if strings.Contains(paths[len(paths)-1], ".xml") {
-		if err = xml.NewDecoder(resp.Body).Decode(dest); err != nil {
+	} else if strings.Contains(file, ".xml") {
+		if err := xml.NewDecoder(resp.Body).Decode(dest); err != nil {
 			return fmt.Errorf(failedToDecodeMessage, err)
 		}
 	} else {
-		if err = json.NewDecoder(resp.Body).Decode(dest); err != nil {
+		if err := json.NewDecoder(resp.Body).Decode(dest); err != nil {
 			return fmt.Errorf(failedToDecodeMessage, err)
 		}
 	}
