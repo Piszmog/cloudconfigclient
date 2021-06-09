@@ -19,8 +19,8 @@ type HTTPClient struct {
 	BaseURL string
 }
 
-// ResourceNotFoundError is a special error that is used to propagate 404s.
-var ResourceNotFoundError = errors.New("failed to find resource")
+// ErrResourceNotFound is a special error that is used to propagate 404s.
+var ErrResourceNotFound = errors.New("failed to find resource")
 
 const (
 	failedToDecodeMessage = "failed to decode response from url: %w"
@@ -40,7 +40,7 @@ func (h *HTTPClient) GetResource(paths []string, params map[string]string, dest 
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode == http.StatusNotFound {
-		return ResourceNotFoundError
+		return ErrResourceNotFound
 	}
 	if resp.StatusCode != http.StatusOK {
 		var b []byte
@@ -85,7 +85,7 @@ func (h *HTTPClient) GetResourceRaw(paths []string, params map[string]string) ([
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode == http.StatusNotFound {
-		return nil, ResourceNotFoundError
+		return nil, ErrResourceNotFound
 	}
 	var b []byte
 	b, err = ioutil.ReadAll(resp.Body)

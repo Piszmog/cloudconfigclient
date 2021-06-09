@@ -29,12 +29,12 @@ func (s *Source) GetPropertySource(fileName string) (PropertySource, error) {
 			return propertySource, nil
 		}
 	}
-	return PropertySource{}, PropertySourceDoesNotExistError
+	return PropertySource{}, ErrPropertySourceDoesNotExist
 }
 
-// PropertySourceDoesNotExistError is the error that is returned when there are no PropertySource that match the specified
+// ErrPropertySourceDoesNotExist is the error that is returned when there are no PropertySource that match the specified
 // file name.
-var PropertySourceDoesNotExistError = errors.New("property source does not exist")
+var ErrPropertySourceDoesNotExist = errors.New("property source does not exist")
 
 // PropertySourceHandler handles the specific PropertySource.
 type PropertySourceHandler func(propertySource PropertySource)
@@ -72,7 +72,7 @@ func (c *Client) GetConfiguration(applicationName string, profiles ...string) (S
 	paths := []string{applicationName, joinProfiles(profiles)}
 	for _, client := range c.clients {
 		if err := client.GetResource(paths, nil, &source); err != nil {
-			if errors.Is(err, ResourceNotFoundError) {
+			if errors.Is(err, ErrResourceNotFound) {
 				continue
 			}
 			return Source{}, err
