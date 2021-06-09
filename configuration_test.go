@@ -77,20 +77,20 @@ func TestClient_GetConfiguration(t *testing.T) {
 			application: "appName",
 			profiles:    []string{"profile"},
 			response:    NewMockHttpResponse(http.StatusInternalServerError, ""),
-			err:         errors.New("failed to find configuration for application appName with profiles [profile]"),
+			err:         errors.New("server responded with status code '500' and body ''"),
 		},
 		{
 			name:        "No Response Body",
 			application: "appName",
 			profiles:    []string{"profile"},
 			response:    NewMockHttpResponse(http.StatusOK, ""),
-			err:         errors.New("failed to find configuration for application appName with profiles [profile]"),
+			err:         errors.New("failed to decode response from url: EOF"),
 		},
 		{
 			name:        "HTTP Error",
 			application: "appName",
 			profiles:    []string{"profile"},
-			err:         errors.New("failed to find configuration for application appName with profiles [profile]"),
+			err:         errors.New("failed to retrieve from http://localhost:8888/appName/profile: Get \"http://localhost:8888/appName/profile\": http: RoundTripper implementation (cloudconfigclient_test.RoundTripFunc) returned a nil *Response with a nil error"),
 		},
 	}
 	for _, test := range tests {
