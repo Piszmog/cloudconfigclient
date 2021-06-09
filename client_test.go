@@ -198,6 +198,28 @@ func TestOption(t *testing.T) {
 			err:    errors.New("failed to parse 'VCAP_SERVICES': failed to unmarshal JSON: unexpected end of JSON input"),
 		},
 		{
+			name: "CFService Not Found",
+			setup: func() {
+				os.Setenv("VCAP_SERVICES", `{
+      "something-else": [
+        {
+          "credentials": {
+            "uri": "http://config",
+            "client_secret": "secret",
+            "client_id": "clientId",
+            "access_token_uri": "http://token"
+          }
+        }
+      ]
+    }`)
+			},
+			cleanup: func() {
+				os.Unsetenv("VCAP_SERVICES")
+			},
+			option: cloudconfigclient.CFService("config-server"),
+			err:    errors.New("failed to create cloud Client: service does not exist"),
+		},
+		{
 			name:   "OAuth2",
 			option: cloudconfigclient.OAuth2("http://config", "clientId", "secret", "http://token"),
 			expected: []*cloudconfigclient.HTTPClient{{
