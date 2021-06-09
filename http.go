@@ -23,6 +23,8 @@ var notFoundError = errors.New("failed to find resource")
 
 // GetResource performs a http.MethodGet operation. Builds the URL based on the provided paths and params. Deserializes
 // the response to the specified destination.
+//
+// Capable of unmarshalling YAML, JSON, and XML. If file type is of another type, use GetResourceRaw instead.
 func (h *HTTPClient) GetResource(paths []string, params map[string]string, dest interface{}) error {
 	resp, err := h.Get(paths, params)
 	if err != nil {
