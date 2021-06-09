@@ -115,15 +115,6 @@ func TestClient_GetConfiguration(t *testing.T) {
 	}
 }
 
-//func TestConfigClient_GetConfigurationWhenError(t *testing.T) {
-//	mockClient := new(mockCloudClient)
-//	response := NewMockHttpResponse(500, configurationSource)
-//	mockClient.On("Get", []string{"appName", "profile"}).Return(response, errors.New("failed"))
-//	Client := NewConfigClient(mockClient)
-//	_, err := Client.GetConfiguration("appName", []string{"profile"})
-//	assert.Error(t, err)
-//}
-
 func TestSource_GetPropertySource(t *testing.T) {
 	source := cloudconfigclient.Source{
 		PropertySources: []cloudconfigclient.PropertySource{
