@@ -165,7 +165,7 @@ func TestOption(t *testing.T) {
 		{
 			name:   "DefaultCFService Error",
 			option: cloudconfigclient.DefaultCFService(),
-			err:    errors.New("failed to create cloud Client: failed to Get credentials for the service p.config-server: failed to unmarshal JSON: unexpected end of JSON input"),
+			err:    errors.New("failed to parse 'VCAP_SERVICES': failed to unmarshal JSON: unexpected end of JSON input"),
 		},
 		{
 			name: "CFService",
@@ -195,7 +195,7 @@ func TestOption(t *testing.T) {
 		{
 			name:   "CFService Error",
 			option: cloudconfigclient.CFService("config-server"),
-			err:    errors.New("failed to create cloud Client: failed to Get credentials for the service config-server: failed to unmarshal JSON: unexpected end of JSON input"),
+			err:    errors.New("failed to parse 'VCAP_SERVICES': failed to unmarshal JSON: unexpected end of JSON input"),
 		},
 		{
 			name:   "OAuth2",

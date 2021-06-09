@@ -89,10 +89,14 @@ func newLocalClient(client *http.Client, urls []string) []*HTTPClient {
 // The service 'p.config-server' is search for first. If not found, 'p-config-server' is searched for.
 func DefaultCFService() Option {
 	return func(clients *[]*HTTPClient) error {
-		httpClients, err := newCloudClientForService(SpringCloudConfigServerName)
+		services, err := cfservices.GetServices()
+		if err != nil {
+			return fmt.Errorf("failed to parse 'VCAP_SERVICES': %w", err)
+		}
+		httpClients, err := newCloudClientForService(SpringCloudConfigServerName, services)
 		if err != nil {
 			if errors.Is(err, cfservices.MissingServiceError) {
-				httpClients, err = newCloudClientForService(ConfigServerName)
+				httpClients, err = newCloudClientForService(ConfigServerName, services)
 				if err != nil {
 					if errors.Is(err, cfservices.MissingServiceError) {
 						return fmt.Errorf("neither %s or %s exist in environment variable 'VCAP_SERVICES'",
@@ -115,7 +119,11 @@ func DefaultCFService() Option {
 // entry and used to build an OAuth Client.
 func CFService(service string) Option {
 	return func(clients *[]*HTTPClient) error {
-		httpClients, err := newCloudClientForService(service)
+		services, err := cfservices.GetServices()
+		if err != nil {
+			return fmt.Errorf("failed to parse 'VCAP_SERVICES': %w", err)
+		}
+		httpClients, err := newCloudClientForService(service, services)
 		if err != nil {
 			return err
 		}
@@ -124,8 +132,8 @@ func CFService(service string) Option {
 	}
 }
 
-func newCloudClientForService(name string) ([]*HTTPClient, error) {
-	creds, err := getCloudCredentials(name)
+func newCloudClientForService(name string, services map[string][]cfservices.Service) ([]*HTTPClient, error) {
+	creds, err := cfservices.GetServiceCredentials(services, name)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create cloud Client: %w", err)
 	}
@@ -134,14 +142,6 @@ func newCloudClientForService(name string) ([]*HTTPClient, error) {
 		clients[i] = &HTTPClient{BaseURL: cred.Uri, Client: newOAuth2Client(cred.ClientId, cred.ClientSecret, cred.AccessTokenUri)}
 	}
 	return clients, nil
-}
-
-func getCloudCredentials(name string) (*cfservices.ServiceCredentials, error) {
-	serviceCreds, err := cfservices.GetServiceCredentialsFromEnvironment(name)
-	if err != nil {
-		return nil, fmt.Errorf("failed to Get credentials for the service %s: %w", name, err)
-	}
-	return serviceCreds, nil
 }
 
 // OAuth2 creates a Client for a Config Server based on the provided OAuth2.0 information.
