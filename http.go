@@ -19,7 +19,8 @@ type HTTPClient struct {
 	BaseURL string
 }
 
-var notFoundError = errors.New("failed to find resource")
+// NotFoundError is a special error that is used to propagate 404s.
+var NotFoundError = errors.New("failed to find resource")
 
 // GetResource performs a http.MethodGet operation. Builds the URL based on the provided paths and params. Deserializes
 // the response to the specified destination.
@@ -35,7 +36,7 @@ func (h *HTTPClient) GetResource(paths []string, params map[string]string, dest 
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode == http.StatusNotFound {
-		return notFoundError
+		return NotFoundError
 	}
 	if resp.StatusCode != http.StatusOK {
 		var b []byte
@@ -73,7 +74,7 @@ func (h *HTTPClient) GetResourceRaw(paths []string, params map[string]string) ([
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode == http.StatusNotFound {
-		return nil, notFoundError
+		return nil, NotFoundError
 	}
 	var b []byte
 	b, err = ioutil.ReadAll(resp.Body)

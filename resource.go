@@ -39,7 +39,7 @@ func (c *Client) getFile(paths []string, params map[string]string, interfaceType
 	fileFound := false
 	for _, client := range c.clients {
 		if err := client.GetResource(paths, params, interfaceType); err != nil {
-			if errors.Is(err, notFoundError) {
+			if errors.Is(err, NotFoundError) {
 				continue
 			}
 			return err
@@ -65,7 +65,7 @@ func (c *Client) getFileRaw(paths []string, params map[string]string) (b []byte,
 	for _, client := range c.clients {
 		b, err = client.GetResourceRaw(paths, params)
 		if err != nil {
-			if errors.Is(err, notFoundError) {
+			if errors.Is(err, NotFoundError) {
 				continue
 			}
 			return
