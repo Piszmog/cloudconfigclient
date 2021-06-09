@@ -42,7 +42,7 @@ type PropertySourceHandler func(propertySource PropertySource)
 // HandlePropertySources handles all PropertySource configurations that are files. This is a convenience method to
 // handle boilerplate for-loop code and filtering of non-configuration files.
 //
-// Config Server may return other configurations (e.g. credhub proeprty sources) that contain no configurations
+// Config Server may return other configurations (e.g. credhub property sources) that contain no configurations
 // (PropertySource.Source is empty).
 func (s *Source) HandlePropertySources(handler PropertySourceHandler) {
 	for _, propertySource := range s.PropertySources {
