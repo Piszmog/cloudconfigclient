@@ -106,7 +106,7 @@ func main() {
 	}
 	fmt.Printf("%+v\n", file)
 	// Retrieves a 'temp2.txt' from the Config Server's default branch in directory 'temp' as a byte slice ([]byte)
-	b, err := configClient.GetFileRaw("temp", "temp1.json")
+	b, err := configClient.GetFileRaw("temp", "temp2.txt")
 	if err != nil {
 		fmt.Println(err)
 		return
