@@ -127,6 +127,17 @@ func TestOption(t *testing.T) {
 			}},
 		},
 		{
+			name: "DefaultCFService Missing Data",
+			setup: func() {
+				os.Setenv("VCAP_SERVICES", `{"p.config-server": []}`)
+			},
+			cleanup: func() {
+				os.Unsetenv("VCAP_SERVICES")
+			},
+			option: cloudconfigclient.DefaultCFService(),
+			err:    errors.New("failed to create cloud Client: p.config-server has no data"),
+		},
+		{
 			name: "DefaultCFService Old Service",
 			setup: func() {
 				os.Setenv("VCAP_SERVICES", `{
@@ -150,6 +161,17 @@ func TestOption(t *testing.T) {
 				BaseURL: "http://config",
 				Client:  oauthClient,
 			}},
+		},
+		{
+			name: "DefaultCFService Old Service Missing Data",
+			setup: func() {
+				os.Setenv("VCAP_SERVICES", `{"p-config-server": []}`)
+			},
+			cleanup: func() {
+				os.Unsetenv("VCAP_SERVICES")
+			},
+			option: cloudconfigclient.DefaultCFService(),
+			err:    errors.New("failed to create cloud Client: p-config-server has no data"),
 		},
 		{
 			name: "DefaultCFService Not Found",
