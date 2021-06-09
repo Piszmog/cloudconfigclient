@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/Piszmog/cloudconfigclient"
+	"github.com/Piszmog/cloudconfigclient/v2"
 	"log"
 	"net/http"
 	"strings"
@@ -11,13 +11,13 @@ import (
 func main() {
 	// ensure you have the Config Server running locally...
 
-	client, err := cloudconfigclient.NewLocalClient(&http.Client{}, []string{"http://localhost:8888"})
+	client, err := cloudconfigclient.New(cloudconfigclient.Local(&http.Client{}, "http://localhost:8888"))
 	if err != nil {
 		log.Fatalln(err)
 	}
 
 	// load a config file
-	configuration, err := client.GetConfiguration("test-app", []string{"local"})
+	configuration, err := client.GetConfiguration("test-app", "local")
 	if err != nil {
 		log.Fatalln(err)
 	}

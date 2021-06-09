@@ -23,7 +23,7 @@ type Source struct {
 // Usually the Config Server will return the PropertySource.Name as an URL of sorts
 // (e.g. ssh://base-url.com/path/to/repository/path/to/file.[yml/properties]). So in order to find the specific file
 // with the desired configurations, the ending of the name needs to be matched against.
-func (s Source) GetPropertySource(fileName string) (PropertySource, error) {
+func (s *Source) GetPropertySource(fileName string) (PropertySource, error) {
 	for _, propertySource := range s.PropertySources {
 		if strings.HasSuffix(propertySource.Name, fileName) {
 			return propertySource, nil
@@ -42,9 +42,9 @@ type PropertySourceHandler func(propertySource PropertySource)
 // HandlePropertySources handles all PropertySource configurations that are files. This is a convenience method to
 // handle boilerplate for-loop code and filtering of non-configuration files.
 //
-// Config Server may return other configurations (e.g. credhub proeprty sources) that contain no configurations
+// Config Server may return other configurations (e.g. credhub property sources) that contain no configurations
 // (PropertySource.Source is empty).
-func (s Source) HandlePropertySources(handler PropertySourceHandler) {
+func (s *Source) HandlePropertySources(handler PropertySourceHandler) {
 	for _, propertySource := range s.PropertySources {
 		if len(filepath.Ext(propertySource.Name)) > 0 {
 			handler(propertySource)
@@ -62,16 +62,17 @@ type PropertySource struct {
 
 // Configuration interface for retrieving an application's configuration files from the Config Server.
 type Configuration interface {
-	GetConfiguration(applicationName string, profiles []string) (Source, error)
+	// GetConfiguration retrieves the configurations/property sources of an application based on the name of the application
+	// and the profiles of the application.
+	GetConfiguration(applicationName string, profiles ...string) (Source, error)
 }
 
-// GetConfiguration retrieves the configurations/property sources of an application based on the name of the application
-// and the profiles of the application.
-func (c ConfigClient) GetConfiguration(applicationName string, profiles []string) (Source, error) {
+func (c *Client) GetConfiguration(applicationName string, profiles ...string) (Source, error) {
 	var source Source
-	for _, client := range c.Clients {
-		if err := getResource(client, &source, applicationName, joinProfiles(profiles)); err != nil {
-			if errors.As(err, &notFoundErrorType) {
+	paths := []string{applicationName, joinProfiles(profiles)}
+	for _, client := range c.clients {
+		if err := client.GetResource(paths, nil, &source); err != nil {
+			if errors.Is(err, ResourceNotFoundError) {
 				continue
 			}
 			return Source{}, err

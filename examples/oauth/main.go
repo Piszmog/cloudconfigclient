@@ -2,8 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/Piszmog/cfservices"
-	"github.com/Piszmog/cloudconfigclient"
+	"github.com/Piszmog/cloudconfigclient/v2"
 	"log"
 	"strings"
 )
@@ -11,21 +10,14 @@ import (
 func main() {
 	// ensure you have the Config Server running locally (or in the cloud) and configured for OAuth2
 
-	creds := []cfservices.Credentials{
-		{
-			Uri:            "config server uri",
-			ClientSecret:   "client secret",
-			ClientId:       "client id",
-			AccessTokenUri: "access token uri",
-		},
-	}
-	client, err := cloudconfigclient.NewOAuth2Client(creds)
+	client, err := cloudconfigclient.New(cloudconfigclient.OAuth2("config server uri", "client id",
+		"client secret", "access token uri"))
 	if err != nil {
 		log.Fatalln(err)
 	}
 
 	// load a config file
-	configuration, err := client.GetConfiguration("test-app", []string{"oauth"})
+	configuration, err := client.GetConfiguration("test-app", "oauth")
 	if err != nil {
 		log.Fatalln(err)
 	}

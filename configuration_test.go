@@ -2,72 +2,117 @@ package cloudconfigclient_test
 
 import (
 	"errors"
-	"github.com/Piszmog/cloudconfigclient"
+	"github.com/Piszmog/cloudconfigclient/v2"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"net/http"
 	"testing"
 )
 
 const (
 	configurationSource = `{
-  "name": "testConfig",
-  "profiles": [
-    "profile"
-  ],
-  "propertySources": [
-    {
-      "name": "test",
-      "source": {
-        "field1": "value1",
-        "field2": 1
-      }
-    }
-  ]
+ "name": "testConfig",
+ "profiles": [
+   "profile"
+ ],
+ "propertySources": [
+   {
+     "name": "test",
+     "source": {
+       "field1": "value1",
+       "field2": 1
+     }
+   }
+ ]
 }`
 )
 
-func TestConfigClient_GetConfiguration(t *testing.T) {
-	mockClient := new(mockCloudClient)
-	response := NewMockHttpResponse(200, configurationSource)
-	mockClient.On("Get", []string{"appName", "profile"}).Return(response, nil)
-	client := NewConfigClient(mockClient)
-	_, err := client.GetConfiguration("appName", []string{"profile"})
-	assert.NoError(t, err, "failed to retrieve configurations with error")
-}
-
-func TestConfigClient_GetConfigurationWhen404(t *testing.T) {
-	mockClient := new(mockCloudClient)
-	response := NewMockHttpResponse(404, "")
-	mockClient.On("Get", []string{"appName", "profile"}).Return(response, nil)
-	client := NewConfigClient(mockClient)
-	_, err := client.GetConfiguration("appName", []string{"profile"})
-	assert.Error(t, err)
-}
-
-func TestConfigClient_GetConfigurationWhenError(t *testing.T) {
-	mockClient := new(mockCloudClient)
-	response := NewMockHttpResponse(500, configurationSource)
-	mockClient.On("Get", []string{"appName", "profile"}).Return(response, errors.New("failed"))
-	client := NewConfigClient(mockClient)
-	_, err := client.GetConfiguration("appName", []string{"profile"})
-	assert.Error(t, err)
-}
-
-func TestConfigClient_GetConfigurationWhenNoErrorBut500(t *testing.T) {
-	mockClient := new(mockCloudClient)
-	response := NewMockHttpResponse(500, configurationSource)
-	mockClient.On("Get", []string{"appName", "profile"}).Return(response, nil)
-	client := NewConfigClient(mockClient)
-	_, err := client.GetConfiguration("appName", []string{"profile"})
-	assert.Error(t, err)
-}
-
-func TestConfigClient_GetConfigurationInvalidResponseBody(t *testing.T) {
-	mockClient := new(mockCloudClient)
-	response := NewMockHttpResponse(200, "")
-	mockClient.On("Get", []string{"appName", "profile"}).Return(response, nil)
-	client := NewConfigClient(mockClient)
-	_, err := client.GetConfiguration("appName", []string{"profile"})
-	assert.Error(t, err)
+func TestClient_GetConfiguration(t *testing.T) {
+	tests := []struct {
+		name        string
+		application string
+		profiles    []string
+		checker     func(*testing.T, *http.Request)
+		response    *http.Response
+		expected    cloudconfigclient.Source
+		err         error
+	}{
+		{
+			name:        "Get Config",
+			application: "appName",
+			profiles:    []string{"profile"},
+			checker: func(t *testing.T, request *http.Request) {
+				require.Equal(t, "http://localhost:8888/appName/profile", request.URL.String())
+			},
+			response: NewMockHttpResponse(http.StatusOK, configurationSource),
+			expected: cloudconfigclient.Source{
+				Name:            "testConfig",
+				Profiles:        []string{"profile"},
+				PropertySources: []cloudconfigclient.PropertySource{{Name: "test", Source: map[string]interface{}{"field1": "value1", "field2": float64(1)}}},
+			},
+		},
+		{
+			name:        "Multiple Profiles",
+			application: "appName",
+			profiles:    []string{"profile1", "profile2", "profile3"},
+			checker: func(t *testing.T, request *http.Request) {
+				require.Equal(t, "http://localhost:8888/appName/profile1,profile2,profile3", request.URL.String())
+			},
+			response: NewMockHttpResponse(http.StatusOK, configurationSource),
+			expected: cloudconfigclient.Source{
+				Name:            "testConfig",
+				Profiles:        []string{"profile"},
+				PropertySources: []cloudconfigclient.PropertySource{{Name: "test", Source: map[string]interface{}{"field1": "value1", "field2": float64(1)}}},
+			},
+		},
+		{
+			name:        "Not Found",
+			application: "appName",
+			profiles:    []string{"profile"},
+			response:    NewMockHttpResponse(http.StatusNotFound, ""),
+			err:         errors.New("failed to find configuration for application appName with profiles [profile]"),
+		},
+		{
+			name:        "Server Error",
+			application: "appName",
+			profiles:    []string{"profile"},
+			response:    NewMockHttpResponse(http.StatusInternalServerError, ""),
+			err:         errors.New("server responded with status code '500' and body ''"),
+		},
+		{
+			name:        "No Response Body",
+			application: "appName",
+			profiles:    []string{"profile"},
+			response:    NewMockHttpResponse(http.StatusOK, ""),
+			err:         errors.New("failed to decode response from url: EOF"),
+		},
+		{
+			name:        "HTTP Error",
+			application: "appName",
+			profiles:    []string{"profile"},
+			err:         errors.New("failed to retrieve from http://localhost:8888/appName/profile: Get \"http://localhost:8888/appName/profile\": http: RoundTripper implementation (cloudconfigclient_test.RoundTripFunc) returned a nil *Response with a nil error"),
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			httpClient := NewMockHttpClient(func(req *http.Request) *http.Response {
+				if test.checker != nil {
+					test.checker(t, req)
+				}
+				return test.response
+			})
+			client, err := cloudconfigclient.New(cloudconfigclient.Local(httpClient, "http://localhost:8888"))
+			require.NoError(t, err)
+			configuration, err := client.GetConfiguration(test.application, test.profiles...)
+			if err != nil {
+				require.Error(t, err)
+				require.Equal(t, test.err.Error(), err.Error())
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, test.expected, configuration)
+			}
+		})
+	}
 }
 
 func TestSource_GetPropertySource(t *testing.T) {
