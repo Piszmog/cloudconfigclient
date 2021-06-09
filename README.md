@@ -80,14 +80,14 @@ func main() {
 	// To create a Client for a locally running Spring Config Server
 	configClient, err := cloudconfigclient.New(cloudconfigclient.LocalEnv(&http.Client{}))
 	// Or
-	configClient, err := cloudconfigclient.New(cloudconfigclient.Local(&http.Client{}, "http://localhost:8888"))
+	configClient, err = cloudconfigclient.New(cloudconfigclient.Local(&http.Client{}, "http://localhost:8888"))
 	// or to create a Client for a Spring Config Server in Cloud Foundry
-	configClient, err := cloudconfigclient.New(cloudconfigclient.DefaultCFService())
+	configClient, err = cloudconfigclient.New(cloudconfigclient.DefaultCFService())
 	// or to create a Client for a Spring Config Server with OAuth2
-	configClient, err := cloudconfigclient.New(cloudconfigclient.OAuth2("config server uri", "client id", "client secret",
+	configClient, err = cloudconfigclient.New(cloudconfigclient.OAuth2("config server uri", "client id", "client secret",
 		"access token uri"))
 	// or a combination of local, Cloud Foundry, and OAuth2
-	configClient, err := cloudconfigclient.New(
+	configClient, err = cloudconfigclient.New(
 		cloudconfigclient.Local(&http.Client{}, "http://localhost:8888"),
 		cloudconfigclient.DefaultCFService(),
 		cloudconfigclient.OAuth2("config server uri", "client id", "client secret", "access token uri"),
@@ -201,8 +201,8 @@ The loaded configurations are in the following JSON format,
 }
 ```
 
-To use the library to retrieve configurations, create a `client/ConfigClient` and invoke the
-method `GetConfiguration(applicationName string, profiles []string)`. The return will be the struct representation of
+To use the library to retrieve configurations, create a `Client` and invoke the
+method `GetConfiguration(applicationName string, profiles ...string)`. The return will be the struct representation of
 the configuration JSON - `client.Configuration`.
 
 ## Resources
@@ -215,10 +215,13 @@ Spring's Config Server allows two ways to retrieve files from a backing reposito
 |`/<appName>/<profiles>/<branch>/<directory>/<file>`|
 
 * When retrieving a file from the Config Server's default branch, the file must not exist at the root of the repository.
+* If the `directory` is in the `searchPath`, it does not have to be specified (depending on SCCS version)
 
 The functions available to retrieve resource files
-are, `GetFile(directory string, file string, interfaceType interface{})` and
-`GetFileFromBranch(branch string, directory string, file string, interfaceType interface{})`.
+are `GetFile(directory string, file string, interfaceType interface{})` and
+`GetFileFromBranch(branch string, directory string, file string, interfaceType interface{})`. To retrieve the data from
+the files, the functions available are `GetFileRaw(directory string, file string)` and
+`GetFileFromBranchRaw(branch string, directory string, file string)`
 
 * The `interfaceType` is the object to deserialize the file to
 
