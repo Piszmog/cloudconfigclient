@@ -56,11 +56,12 @@ func (s *Source) HandlePropertySources(handler PropertySourceHandler) {
 	}
 }
 
+// Get retrieve a property from the Source. It loops through all PropertySource and return the first key value.
+// If none is found, it return defaultValue.
 func (s *Source) Get(key string, defaultValue string) interface{} {
 	for _, propertySource := range s.PropertySources {
-		for _key, value := range propertySource.Source {
-			fmt.Printf("key=%s, value=%v\n", _key, value)
-			if key == _key {
+		for sourceKey, value := range propertySource.Source {
+			if key == sourceKey {
 				return value
 			}
 		}
@@ -113,13 +114,13 @@ func (s *Source) toMap() {
 	for _, propertySource := range s.PropertySources {
 		for key, value := range propertySource.Source {
 			entries := strings.Split(key, ".")
-			result = insertInMapRecursion(entries, value, result)
+			result = InsertInMapRecursion(entries, value, result)
 		}
 	}
 	s.Data = result
 }
 
-func insertInMap(s []string, value interface{}, dest map[string]interface{}) map[string]interface{} {
+func InsertInMap(s []string, value interface{}, dest map[string]interface{}) map[string]interface{} {
 	keys := s[:len(s)-1]
 	last := s[len(s)-1]
 
@@ -139,14 +140,14 @@ func insertInMap(s []string, value interface{}, dest map[string]interface{}) map
 	return dest
 }
 
-func insertInMapRecursion(s []string, value interface{}, dest map[string]interface{}) map[string]interface{} {
+func InsertInMapRecursion(s []string, value interface{}, dest map[string]interface{}) map[string]interface{} {
 	key := s[0]
 	if len(s) > 1 {
 		switch dest[key].(type) {
 		case nil:
-			dest[key] = insertInMap(s[1:], value, map[string]interface{}{})
+			dest[key] = InsertInMapRecursion(s[1:], value, map[string]interface{}{})
 		case map[string]interface{}:
-			dest[key] = insertInMap(s[1:], value, dest[key].(map[string]interface{}))
+			dest[key] = InsertInMapRecursion(s[1:], value, dest[key].(map[string]interface{}))
 		}
 	} else if len(s) == 1 {
 		if dest[key] == nil {

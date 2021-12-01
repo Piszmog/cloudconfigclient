@@ -1,9 +1,10 @@
-module github.com/duvalhub/cloudconfigclient
+module github.com/Piszmog/cloudconfigclient/v2
 
 go 1.15
 
 require (
 	github.com/Piszmog/cfservices v1.4.3
+	github.com/Piszmog/cloudconfigclient/v2 v2.0.1 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/net v0.0.0-20210525063256-abc453219eb5 // indirect

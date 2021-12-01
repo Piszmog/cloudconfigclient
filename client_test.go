@@ -3,13 +3,12 @@ package cloudconfigclient_test
 import (
 	"context"
 	"errors"
-	"net/http"
-	"os"
-	"testing"
-
 	"github.com/Piszmog/cloudconfigclient/v2"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2/clientcredentials"
+	"net/http"
+	"os"
+	"testing"
 )
 
 func TestNew(t *testing.T) {
