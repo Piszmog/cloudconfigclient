@@ -3,12 +3,11 @@ package cloudconfigclient_test
 import (
 	"errors"
 	"net/http"
-	"reflect"
-	"testing"
-
-	"github.com/duvalhub/cloudconfigclient"
+	"github.com/cloudconfigclient/cloudconfigclient"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"reflect"
+	"testing"
 )
 
 const (
@@ -105,7 +104,7 @@ func TestClient_GetConfiguration(t *testing.T) {
 			})
 			client, err := cloudconfigclient.New(cloudconfigclient.Local(httpClient, "http://localhost:8888"))
 			require.NoError(t, err)
-			configuration, err := client.GetConfiguration(test.application, test.profiles...)
+			configuration, err := client.GetConfiguration(test.application, test.profiles, "")
 			if err != nil {
 				require.Error(t, err)
 				require.Equal(t, test.err.Error(), err.Error())
@@ -177,7 +176,6 @@ func TestSource_HandlePropertySources_NonFileExcluded(t *testing.T) {
 }
 
 func TestInsertInMap(t *testing.T) {
-
 	type args struct {
 		s     []string
 		value string
@@ -340,7 +338,7 @@ func TestInsertInMap(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := insertInMapRecursion(tt.args.s, tt.args.value, tt.args.dest)
+			got := cloudconfigclient.InsertInMapRecursion(tt.args.s, tt.args.value, tt.args.dest)
 			if !reflect.DeepEqual(tt.want, got) {
 				t.Errorf("insertInMap() = %v, want %v", got, tt.want)
 			}
