@@ -21,6 +21,7 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+	// we can also call configuration.Unmarshal(..) to unmarshal the configuration into a struct
 	localProp, err := configuration.GetPropertySource("application-oauth.yml")
 	if err != nil {
 		log.Fatalln("failed to find oauth property file")
