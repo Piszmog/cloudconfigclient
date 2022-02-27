@@ -128,7 +128,8 @@ func main() {
 }
 
 type Config struct {
-	Example string `json:"example"`
+	Field1 string `json:"example"`
+	Field2 int    `json:"field2"`
 }
 ```
 
