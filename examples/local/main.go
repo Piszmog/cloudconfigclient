@@ -21,7 +21,13 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	// we can also call configuration.Unmarshal(..) to unmarshal the configuration into a struct
+	// we can either unmarshal into a struct
+	var configData configStruct
+	if err = configuration.Unmarshal(&configData); err != nil {
+		log.Fatalln("failed to find cloud property file")
+	}
+
+	// or manually access the values
 	localProp, err := configuration.GetPropertySource("application-local.yml")
 	if err != nil {
 		log.Fatalln("failed to find local property file")
@@ -49,4 +55,8 @@ func main() {
 		log.Fatalln(err)
 	}
 	fmt.Printf("file from specific branch: %+v\n", b)
+}
+
+type configStruct struct {
+	Field1 string `json:"field1"`
 }
