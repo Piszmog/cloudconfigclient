@@ -123,8 +123,8 @@ func main() {
 	var configStruct Config
 	err = config.Unmarshal(&configStruct)
 	if err != nil {
-        fmt.Println(err)
-    }
+		fmt.Println(err)
+	}
 }
 
 type Config struct {
