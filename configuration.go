@@ -1,9 +1,12 @@
 package cloudconfigclient
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"path/filepath"
+	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -50,6 +53,90 @@ func (s *Source) HandlePropertySources(handler PropertySourceHandler) {
 			handler(propertySource)
 		}
 	}
+}
+
+// Unmarshal converts the Source.PropertySources to the specified type. The type must be a pointer to a struct.
+//
+// The provided pointer struct must use JSON tags to map to the PropertySource.Source.
+//
+// This function is not optimized (ugly) and is intended to only be used at startup.
+func (s *Source) Unmarshal(v interface{}) error {
+	// covert to a map[string]interface{} so we can convert to the target type
+	obj, err := toJson(s.PropertySources)
+	if err != nil {
+		return err
+	}
+	// convert to bytes
+	b, err := json.Marshal(obj)
+	if err != nil {
+		return err
+	}
+	// now we can get to our target type
+	return json.Unmarshal(b, v)
+}
+
+var sliceRegex = regexp.MustCompile(`(.*)\[(\d+)]`)
+
+func toJson(propertySources []PropertySource) (map[string]interface{}, error) {
+	// get ready for a wild ride...
+	output := map[string]interface{}{}
+	// save the root, so we can get back there when we walk the tree
+	root := output
+	_ = root
+	for _, propertySource := range propertySources {
+		for k, v := range propertySource.Source {
+			keys := strings.Split(k, ".")
+			for i, key := range keys {
+				// determine if we are detailing with a slice - e.g. foo[0] or bar[0]
+				matches := sliceRegex.FindStringSubmatch(key)
+				if matches != nil {
+					actualKey := matches[1]
+					if _, ok := output[actualKey]; !ok {
+						output[actualKey] = []interface{}{}
+					}
+					if len(keys)-1 == i {
+						// the value go straight into the slice, we don't have any slice of objects
+						output[actualKey] = append(output[actualKey].([]interface{}), v)
+						output = root
+					} else {
+						// ugh... we have a slice of objects
+						// convert the index of the path, the index now matters
+						index, err := strconv.Atoi(matches[2])
+						if err != nil {
+							return nil, err
+						}
+						var obj map[string]interface{}
+						slice := output[actualKey].([]interface{})
+						// determine if the index we are walking exists yet in the slice we have built up
+						if len(slice) > index {
+							obj = slice[index].(map[string]interface{})
+							if obj == nil {
+								obj = map[string]interface{}{}
+							}
+						} else {
+							// the index does not exist, so we need to create it
+							for j := len(slice); j <= index; j++ {
+								output[actualKey] = append(output[actualKey].([]interface{}), map[string]interface{}{})
+							}
+							obj = output[actualKey].([]interface{})[index].(map[string]interface{})
+						}
+						output = obj
+					}
+				} else if len(keys)-1 == i {
+					// the value go straight into the key
+					output[key] = v
+					output = root
+				} else {
+					// need to create a nested object
+					if _, ok := output[key]; !ok {
+						output[key] = map[string]interface{}{}
+					}
+					output = output[key].(map[string]interface{})
+				}
+			}
+		}
+	}
+	return output, nil
 }
 
 // PropertySource is the property source for the application.

@@ -173,3 +173,123 @@ func TestSource_HandlePropertySources_NonFileExcluded(t *testing.T) {
 	})
 	assert.Equal(t, 3, count)
 }
+
+func TestSource_Unmarshal(t *testing.T) {
+	tests := []struct {
+		name     string
+		source   cloudconfigclient.Source
+		expected testStruct
+		hasError bool
+	}{
+		{
+			name: "Full Struct",
+			source: cloudconfigclient.Source{
+				PropertySources: []cloudconfigclient.PropertySource{
+					{
+						Name: "application-foo.yml",
+						Source: map[string]interface{}{
+							"stringVal":                "value1",
+							"intVal":                   1,
+							"sliceString[0]":           "value2",
+							"sliceInt[0]":              2,
+							"sliceStruct[0].stringVal": "value5",
+							"sliceStruct[0].intVal":    4,
+							"sliceStruct[1].intVal":    5,
+							"sliceStruct[1].stringVal": "value6",
+						},
+					},
+				},
+			},
+			expected: testStruct{
+				StringVal: "value1",
+				IntVal:    1,
+				SliceString: []string{
+					"value2",
+				},
+				SliceInt: []int{
+					2,
+				},
+				SliceStruct: []nestedStruct{
+					{
+						StringVal: "value5",
+						IntVal:    4,
+					},
+					{
+						StringVal: "value6",
+						IntVal:    5,
+					},
+				},
+			},
+		},
+		{
+			name: "Split Across Files",
+			source: cloudconfigclient.Source{
+				PropertySources: []cloudconfigclient.PropertySource{
+					{
+						Name: "application-foo.yml",
+						Source: map[string]interface{}{
+							"stringVal":      "value1",
+							"intVal":         1,
+							"sliceString[0]": "value2",
+							"sliceInt[0]":    2,
+						},
+					},
+					{
+						Name: "application-foo-dev.yml",
+						Source: map[string]interface{}{
+							"sliceStruct[0].stringVal": "value5",
+							"sliceStruct[0].intVal":    4,
+							"sliceStruct[1].intVal":    5,
+							"sliceStruct[1].stringVal": "value6",
+						},
+					},
+				},
+			},
+			expected: testStruct{
+				StringVal: "value1",
+				IntVal:    1,
+				SliceString: []string{
+					"value2",
+				},
+				SliceInt: []int{
+					2,
+				},
+				SliceStruct: []nestedStruct{
+					{
+						StringVal: "value5",
+						IntVal:    4,
+					},
+					{
+						StringVal: "value6",
+						IntVal:    5,
+					},
+				},
+			},
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			var actual testStruct
+			err := test.source.Unmarshal(&actual)
+			if test.hasError {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, actual)
+			}
+		})
+	}
+}
+
+type testStruct struct {
+	StringVal   string         `json:"stringVal"`
+	IntVal      int            `json:"intVal"`
+	SliceString []string       `json:"sliceString"`
+	SliceInt    []int          `json:"sliceInt"`
+	SliceStruct []nestedStruct `json:"sliceStruct"`
+}
+
+type nestedStruct struct {
+	StringVal string `json:"stringVal"`
+	IntVal    int    `json:"intVal"`
+}

@@ -119,6 +119,16 @@ func main() {
 		return
 	}
 	fmt.Printf("%+v", config)
+	// if we want, we can convert the config to a struct
+	var configStruct Config
+	err = config.Unmarshal(&configStruct)
+	if err != nil {
+        fmt.Println(err)
+    }
+}
+
+type Config struct {
+	Example string `json:"example"`
 }
 ```
 
