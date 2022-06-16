@@ -15,11 +15,11 @@ var useDefaultLabel = map[string]string{"useDefaultLabel": "true"}
 type Resource interface {
 	// GetFile retrieves the specified file from the provided directory from the Config Server's default branch.
 	//
-	// The file will be deserialize into the specified interface type.
+	// The file will be deserialized into the specified interface type.
 	GetFile(directory string, file string, interfaceType interface{}) error
 	// GetFileFromBranch retrieves the specified file from the provided branch in the provided directory.
 	//
-	// The file will be deserialize into the specified interface type.
+	// The file will be deserialized into the specified interface type.
 	GetFileFromBranch(branch string, directory string, file string, interfaceType interface{}) error
 	// GetFileRaw retrieves the file from the default branch as a byte slice.
 	GetFileRaw(directory string, file string) ([]byte, error)
@@ -29,14 +29,14 @@ type Resource interface {
 
 // GetFile retrieves the specified file from the provided directory from the Config Server's default branch.
 //
-// The file will be deserialize into the specified interface type.
+// The file will be deserialized into the specified interface type.
 func (c *Client) GetFile(directory string, file string, interfaceType interface{}) error {
 	return c.getFile([]string{defaultApplicationName, defaultApplicationProfile, directory, file}, useDefaultLabel, interfaceType)
 }
 
 // GetFileFromBranch retrieves the specified file from the provided branch in the provided directory.
 //
-// The file will be deserialize into the specified interface type.
+// The file will be deserialized into the specified interface type.
 func (c *Client) GetFileFromBranch(branch string, directory string, file string, interfaceType interface{}) error {
 	return c.getFile([]string{defaultApplicationName, defaultApplicationProfile, branch, directory, file}, nil, interfaceType)
 }
