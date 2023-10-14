@@ -76,10 +76,14 @@ type Example struct {
 }
 
 func main() {
-	// To create a Client for a locally running Spring Config Server
+	// To create a Client for a locally running Spring Config Server without credentials
 	configClient, err := cloudconfigclient.New(cloudconfigclient.LocalEnv(&http.Client{}))
 	// Or
 	configClient, err = cloudconfigclient.New(cloudconfigclient.Local(&http.Client{}, "http://localhost:8888"))
+	// To create a Client for a locally running Spring Config Server with credentials
+	configClient, err := cloudconfigclient.New(cloudconfigclient.LocalEnv(&http.Client{}, &cloudconfigclient.BasicAuthCredential{Username: '', Password: ''}))
+	// Or
+	configClient, err = cloudconfigclient.New(cloudconfigclient.Local(&http.Client{}, &cloudconfigclient.BasicAuthCredential{Username: '', Password: ''}, "http://localhost:8888"))
 	// or to create a Client for a Spring Config Server in Cloud Foundry
 	configClient, err = cloudconfigclient.New(cloudconfigclient.DefaultCFService())
 	// or to create a Client for a Spring Config Server with OAuth2
