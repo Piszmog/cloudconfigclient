@@ -2,10 +2,11 @@ package cloudconfigclient_test
 
 import (
 	"errors"
-	"github.com/Piszmog/cloudconfigclient/v2"
-	"github.com/stretchr/testify/require"
 	"net/http"
 	"testing"
+
+	"github.com/Piszmog/cloudconfigclient/v2"
+	"github.com/stretchr/testify/require"
 )
 
 const (
@@ -59,7 +60,7 @@ func TestClient_GetFile(t *testing.T) {
 				}
 				return test.response
 			})
-			client, err := cloudconfigclient.New(cloudconfigclient.Local(httpClient, "http://localhost:8888"))
+			client, err := cloudconfigclient.New(cloudconfigclient.Local(httpClient, &cloudconfigclient.BasicAuthCredential{}, "http://localhost:8888"))
 			require.NoError(t, err)
 
 			var actual file
@@ -110,7 +111,7 @@ func TestClient_GetFileFromBranch(t *testing.T) {
 				}
 				return test.response
 			})
-			client, err := cloudconfigclient.New(cloudconfigclient.Local(httpClient, "http://localhost:8888"))
+			client, err := cloudconfigclient.New(cloudconfigclient.Local(httpClient, &cloudconfigclient.BasicAuthCredential{}, "http://localhost:8888"))
 			require.NoError(t, err)
 
 			var actual file
@@ -161,7 +162,7 @@ func TestClient_GetFileRaw(t *testing.T) {
 				}
 				return test.response
 			})
-			client, err := cloudconfigclient.New(cloudconfigclient.Local(httpClient, "http://localhost:8888"))
+			client, err := cloudconfigclient.New(cloudconfigclient.Local(httpClient, &cloudconfigclient.BasicAuthCredential{}, "http://localhost:8888"))
 			require.NoError(t, err)
 
 			actual, err := client.GetFileRaw("directory", "file.txt")
@@ -211,7 +212,7 @@ func TestClient_GetFileFromBranchRaw(t *testing.T) {
 				}
 				return test.response
 			})
-			client, err := cloudconfigclient.New(cloudconfigclient.Local(httpClient, "http://localhost:8888"))
+			client, err := cloudconfigclient.New(cloudconfigclient.Local(httpClient, &cloudconfigclient.BasicAuthCredential{}, "http://localhost:8888"))
 			require.NoError(t, err)
 
 			actual, err := client.GetFileFromBranchRaw("branch", "directory", "file.txt")

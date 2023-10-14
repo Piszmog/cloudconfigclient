@@ -2,11 +2,12 @@ package cloudconfigclient_test
 
 import (
 	"errors"
+	"net/http"
+	"testing"
+
 	"github.com/Piszmog/cloudconfigclient/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"net/http"
-	"testing"
 )
 
 const (
@@ -101,7 +102,7 @@ func TestClient_GetConfiguration(t *testing.T) {
 				}
 				return test.response
 			})
-			client, err := cloudconfigclient.New(cloudconfigclient.Local(httpClient, "http://localhost:8888"))
+			client, err := cloudconfigclient.New(cloudconfigclient.Local(httpClient, &cloudconfigclient.BasicAuthCredential{}, "http://localhost:8888"))
 			require.NoError(t, err)
 			configuration, err := client.GetConfiguration(test.application, test.profiles...)
 			if err != nil {

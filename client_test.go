@@ -3,12 +3,13 @@ package cloudconfigclient_test
 import (
 	"context"
 	"errors"
-	"github.com/Piszmog/cloudconfigclient/v2"
-	"github.com/stretchr/testify/require"
-	"golang.org/x/oauth2/clientcredentials"
 	"net/http"
 	"os"
 	"testing"
+
+	"github.com/Piszmog/cloudconfigclient/v2"
+	"github.com/stretchr/testify/require"
+	"golang.org/x/oauth2/clientcredentials"
 )
 
 func TestNew(t *testing.T) {
@@ -24,12 +25,12 @@ func TestNew(t *testing.T) {
 		},
 		{
 			name:    "Option Error",
-			options: []cloudconfigclient.Option{cloudconfigclient.LocalEnv(&http.Client{})},
+			options: []cloudconfigclient.Option{cloudconfigclient.LocalEnv(&http.Client{}, &cloudconfigclient.BasicAuthCredential{})},
 			err:     errors.New("no local Config Server URLs provided in environment variable CONFIG_SERVER_URLS"),
 		},
 		{
 			name:    "Created",
-			options: []cloudconfigclient.Option{cloudconfigclient.Local(&http.Client{}, "http:localhost:8888")},
+			options: []cloudconfigclient.Option{cloudconfigclient.Local(&http.Client{}, &cloudconfigclient.BasicAuthCredential{}, "http:localhost:8888")},
 			err:     nil,
 		},
 	}
@@ -66,8 +67,19 @@ func TestOption(t *testing.T) {
 			cleanup: func() {
 				os.Unsetenv(cloudconfigclient.EnvironmentLocalConfigServerUrls)
 			},
-			option:   cloudconfigclient.LocalEnv(&http.Client{}),
-			expected: []*cloudconfigclient.HTTPClient{{BaseURL: "http://localhost:8880", Client: &http.Client{}}},
+			option:   cloudconfigclient.LocalEnv(&http.Client{}, &cloudconfigclient.BasicAuthCredential{}),
+			expected: []*cloudconfigclient.HTTPClient{{BaseURL: "http://localhost:8880", Client: &http.Client{}, BasicAuth: &cloudconfigclient.BasicAuthCredential{}}},
+		},
+		{
+			name: "LocalEnv With Credentials",
+			setup: func() {
+				os.Setenv(cloudconfigclient.EnvironmentLocalConfigServerUrls, "http://localhost:8880")
+			},
+			cleanup: func() {
+				os.Unsetenv(cloudconfigclient.EnvironmentLocalConfigServerUrls)
+			},
+			option:   cloudconfigclient.LocalEnv(&http.Client{}, &cloudconfigclient.BasicAuthCredential{Username: "test", Password: "testpass"}),
+			expected: []*cloudconfigclient.HTTPClient{{BaseURL: "http://localhost:8880", Client: &http.Client{}, BasicAuth: &cloudconfigclient.BasicAuthCredential{Username: "test", Password: "testpass"}}},
 		},
 		{
 			name: "LocalEnv Multiple",
@@ -77,28 +89,55 @@ func TestOption(t *testing.T) {
 			cleanup: func() {
 				os.Unsetenv(cloudconfigclient.EnvironmentLocalConfigServerUrls)
 			},
-			option: cloudconfigclient.LocalEnv(&http.Client{}),
+			option: cloudconfigclient.LocalEnv(&http.Client{}, &cloudconfigclient.BasicAuthCredential{}),
 			expected: []*cloudconfigclient.HTTPClient{
-				{BaseURL: "http://localhost:8880", Client: &http.Client{}},
-				{BaseURL: "http://localhost:8888", Client: &http.Client{}},
+				{BaseURL: "http://localhost:8880", Client: &http.Client{}, BasicAuth: &cloudconfigclient.BasicAuthCredential{}},
+				{BaseURL: "http://localhost:8888", Client: &http.Client{}, BasicAuth: &cloudconfigclient.BasicAuthCredential{}},
+			},
+		},
+		{
+			name: "LocalEnv Multiple With Credential",
+			setup: func() {
+				os.Setenv(cloudconfigclient.EnvironmentLocalConfigServerUrls, "http://localhost:8880,http://localhost:8888")
+			},
+			cleanup: func() {
+				os.Unsetenv(cloudconfigclient.EnvironmentLocalConfigServerUrls)
+			},
+			option: cloudconfigclient.LocalEnv(&http.Client{}, &cloudconfigclient.BasicAuthCredential{Username: "test", Password: "testpass"}),
+			expected: []*cloudconfigclient.HTTPClient{
+				{BaseURL: "http://localhost:8880", Client: &http.Client{}, BasicAuth: &cloudconfigclient.BasicAuthCredential{Username: "test", Password: "testpass"}},
+				{BaseURL: "http://localhost:8888", Client: &http.Client{}, BasicAuth: &cloudconfigclient.BasicAuthCredential{Username: "test", Password: "testpass"}},
 			},
 		},
 		{
 			name:   "LocalEnv Error",
-			option: cloudconfigclient.LocalEnv(&http.Client{}),
+			option: cloudconfigclient.LocalEnv(&http.Client{}, &cloudconfigclient.BasicAuthCredential{}),
 			err:    errors.New("no local Config Server URLs provided in environment variable CONFIG_SERVER_URLS"),
 		},
 		{
 			name:     "Local",
-			option:   cloudconfigclient.Local(&http.Client{}, "http://localhost:8880"),
-			expected: []*cloudconfigclient.HTTPClient{{BaseURL: "http://localhost:8880", Client: &http.Client{}}},
+			option:   cloudconfigclient.Local(&http.Client{}, &cloudconfigclient.BasicAuthCredential{}, "http://localhost:8880"),
+			expected: []*cloudconfigclient.HTTPClient{{BaseURL: "http://localhost:8880", Client: &http.Client{}, BasicAuth: &cloudconfigclient.BasicAuthCredential{}}},
+		},
+		{
+			name:     "Local With Credential",
+			option:   cloudconfigclient.Local(&http.Client{}, &cloudconfigclient.BasicAuthCredential{Username: "test", Password: "testpass"}, "http://localhost:8880"),
+			expected: []*cloudconfigclient.HTTPClient{{BaseURL: "http://localhost:8880", Client: &http.Client{}, BasicAuth: &cloudconfigclient.BasicAuthCredential{Username: "test", Password: "testpass"}}},
 		},
 		{
 			name:   "Local Multiple",
-			option: cloudconfigclient.Local(&http.Client{}, "http://localhost:8880", "http://localhost:8888"),
+			option: cloudconfigclient.Local(&http.Client{}, &cloudconfigclient.BasicAuthCredential{}, "http://localhost:8880", "http://localhost:8888"),
 			expected: []*cloudconfigclient.HTTPClient{
-				{BaseURL: "http://localhost:8880", Client: &http.Client{}},
-				{BaseURL: "http://localhost:8888", Client: &http.Client{}},
+				{BaseURL: "http://localhost:8880", Client: &http.Client{}, BasicAuth: &cloudconfigclient.BasicAuthCredential{}},
+				{BaseURL: "http://localhost:8888", Client: &http.Client{}, BasicAuth: &cloudconfigclient.BasicAuthCredential{}},
+			},
+		},
+		{
+			name:   "Local Multiple With Credential",
+			option: cloudconfigclient.Local(&http.Client{}, &cloudconfigclient.BasicAuthCredential{Username: "test", Password: "testpass"}, "http://localhost:8880", "http://localhost:8888"),
+			expected: []*cloudconfigclient.HTTPClient{
+				{BaseURL: "http://localhost:8880", Client: &http.Client{}, BasicAuth: &cloudconfigclient.BasicAuthCredential{Username: "test", Password: "testpass"}},
+				{BaseURL: "http://localhost:8888", Client: &http.Client{}, BasicAuth: &cloudconfigclient.BasicAuthCredential{Username: "test", Password: "testpass"}},
 			},
 		},
 		{
