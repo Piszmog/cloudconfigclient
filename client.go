@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/Piszmog/cfservices"
-	"golang.org/x/oauth2/clientcredentials"
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/Piszmog/cfservices"
+	"golang.org/x/oauth2/clientcredentials"
 )
 
 const (
@@ -23,6 +24,12 @@ const (
 // Client contains the clients of the Config Servers.
 type Client struct {
 	clients []*HTTPClient
+}
+
+// Basic Auth credential for the local config server
+type BasicAuthCredential struct {
+	Username string
+	Password string
 }
 
 // New creates a new Client based on the provided options. A Client can be configured to communicate with
@@ -47,9 +54,9 @@ type Option func(*[]*HTTPClient) error
 
 // LocalEnv creates a clients for a locally running Config Servers. The URLs to the Config Servers are acquired from the
 // environment variable 'CONFIG_SERVER_URLS'.
-func LocalEnv(client *http.Client) Option {
+func LocalEnv(client *http.Client, basicAuth *BasicAuthCredential) Option {
 	return func(clients *[]*HTTPClient) error {
-		httpClients, err := newLocalClientFromEnv(client)
+		httpClients, err := newLocalClientFromEnv(client, basicAuth)
 		if err != nil {
 			return err
 		}
@@ -58,26 +65,26 @@ func LocalEnv(client *http.Client) Option {
 	}
 }
 
-func newLocalClientFromEnv(client *http.Client) ([]*HTTPClient, error) {
+func newLocalClientFromEnv(client *http.Client, basicAuth *BasicAuthCredential) ([]*HTTPClient, error) {
 	localUrls := os.Getenv(EnvironmentLocalConfigServerUrls)
 	if len(localUrls) == 0 {
 		return nil, fmt.Errorf("no local Config Server URLs provided in environment variable %s", EnvironmentLocalConfigServerUrls)
 	}
-	return newLocalClient(client, strings.Split(localUrls, ",")), nil
+	return newLocalClient(client, basicAuth, strings.Split(localUrls, ",")), nil
 }
 
 // Local creates a clients for a locally running Config Servers.
-func Local(client *http.Client, urls ...string) Option {
+func Local(client *http.Client, basicAuth *BasicAuthCredential, urls ...string) Option {
 	return func(clients *[]*HTTPClient) error {
-		*clients = append(*clients, newLocalClient(client, urls)...)
+		*clients = append(*clients, newLocalClient(client, basicAuth, urls)...)
 		return nil
 	}
 }
 
-func newLocalClient(client *http.Client, urls []string) []*HTTPClient {
+func newLocalClient(client *http.Client, basicAuth *BasicAuthCredential, urls []string) []*HTTPClient {
 	clients := make([]*HTTPClient, len(urls), len(urls))
 	for index, baseUrl := range urls {
-		clients[index] = &HTTPClient{BaseURL: baseUrl, Client: client}
+		clients[index] = &HTTPClient{BaseURL: baseUrl, Client: client, BasicAuth: basicAuth}
 	}
 	return clients
 }

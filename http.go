@@ -5,18 +5,20 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"path"
 	"strings"
+
+	"gopkg.in/yaml.v3"
 )
 
 // HTTPClient is a wrapper for http.Client.
 type HTTPClient struct {
 	*http.Client
-	BaseURL string
+	BaseURL   string
+	BasicAuth *BasicAuthCredential
 }
 
 // ErrResourceNotFound is a special error that is used to propagate 404s.
@@ -104,7 +106,15 @@ func (h *HTTPClient) Get(paths []string, params map[string]string) (*http.Respon
 	if err != nil {
 		return nil, fmt.Errorf("failed to create url: %w", err)
 	}
-	response, err := h.Client.Get(fullUrl)
+	request, err := http.NewRequest("GET", fullUrl, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if h.BasicAuth != nil {
+		request.SetBasicAuth(h.BasicAuth.Username, h.BasicAuth.Password)
+	}
+	response, err := h.Client.Do(request)
 	if err != nil {
 		return nil, fmt.Errorf("failed to retrieve from %s: %w", fullUrl, err)
 	}
