@@ -131,7 +131,7 @@ func TestClient_GetConfigurationWithLabel(t *testing.T) {
 			application: "appName",
 			profiles:    []string{"profile"},
 			checker: func(t *testing.T, request *http.Request) {
-				require.Equal(t, "http://localhost:8888/appName/profile", request.URL.String())
+				require.Equal(t, "http://localhost:8888/appName/profile/master", request.URL.String())
 			},
 			response: NewMockHttpResponse(http.StatusOK, configurationSource),
 			expected: cloudconfigclient.Source{
@@ -146,7 +146,7 @@ func TestClient_GetConfigurationWithLabel(t *testing.T) {
 			application: "appName",
 			profiles:    []string{"profile1", "profile2", "profile3"},
 			checker: func(t *testing.T, request *http.Request) {
-				require.Equal(t, "http://localhost:8888/appName/profile1,profile2,profile3", request.URL.String())
+				require.Equal(t, "http://localhost:8888/appName/profile1,profile2,profile3/master", request.URL.String())
 			},
 			response: NewMockHttpResponse(http.StatusOK, configurationSource),
 			expected: cloudconfigclient.Source{
@@ -184,7 +184,7 @@ func TestClient_GetConfigurationWithLabel(t *testing.T) {
 			label:       "master"
 			application: "appName",
 			profiles:    []string{"profile"},
-			err:         errors.New("failed to retrieve from http://localhost:8888/appName/profile: Get \"http://localhost:8888/appName/profile\": http: RoundTripper implementation (cloudconfigclient_test.RoundTripFunc) returned a nil *Response with a nil error"),
+			err:         errors.New("failed to retrieve from http://localhost:8888/appName/profile/master: Get \"http://localhost:8888/appName/profile/master\": http: RoundTripper implementation (cloudconfigclient_test.RoundTripFunc) returned a nil *Response with a nil error"),
 		},
 	}
 	for _, test := range tests {
