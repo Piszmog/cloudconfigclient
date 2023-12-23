@@ -185,7 +185,7 @@ func (c *Client) GetConfigurationWithLabel(label string, applicationName string,
 		}
 		return source, nil
 	}
-	return Source{}, fmt.Errorf("failed to find configuration for application %s with profiles %s", applicationName, profiles)
+	return Source{}, fmt.Errorf("failed to find configuration for application %s with profiles %s and label %s", applicationName, profiles, label)
 }
 
 func joinProfiles(profiles []string) string {
