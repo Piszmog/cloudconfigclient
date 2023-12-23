@@ -114,6 +114,100 @@ func TestClient_GetConfiguration(t *testing.T) {
 		})
 	}
 }
+func TestClient_GetConfigurationWithLabel(t *testing.T) {
+	tests := []struct {
+		name        string
+		label       string
+		application string
+		profiles    []string
+		checker     func(*testing.T, *http.Request)
+		response    *http.Response
+		expected    cloudconfigclient.Source
+		err         error
+	}{
+		{
+			name:        "Get Config",
+			label:       "master"
+			application: "appName",
+			profiles:    []string{"profile"},
+			checker: func(t *testing.T, request *http.Request) {
+				require.Equal(t, "http://localhost:8888/appName/profile/master", request.URL.String())
+			},
+			response: NewMockHttpResponse(http.StatusOK, configurationSource),
+			expected: cloudconfigclient.Source{
+				Name:            "testConfig",
+				Profiles:        []string{"profile"},
+				PropertySources: []cloudconfigclient.PropertySource{{Name: "test", Source: map[string]interface{}{"field1": "value1", "field2": float64(1)}}},
+			},
+		},
+		{
+			name:        "Multiple Profiles",
+			label:       "master"
+			application: "appName",
+			profiles:    []string{"profile1", "profile2", "profile3"},
+			checker: func(t *testing.T, request *http.Request) {
+				require.Equal(t, "http://localhost:8888/appName/profile1,profile2,profile3/master", request.URL.String())
+			},
+			response: NewMockHttpResponse(http.StatusOK, configurationSource),
+			expected: cloudconfigclient.Source{
+				Name:            "testConfig",
+				Profiles:        []string{"profile"},
+				PropertySources: []cloudconfigclient.PropertySource{{Name: "test", Source: map[string]interface{}{"field1": "value1", "field2": float64(1)}}},
+			},
+		},
+		{
+			name:        "Not Found",
+			label:       "master"
+			application: "appName",
+			profiles:    []string{"profile"},
+			response:    NewMockHttpResponse(http.StatusNotFound, ""),
+			err:         errors.New("failed to find configuration for application appName with profiles [profile]"),
+		},
+		{
+			name:        "Server Error",
+			label:       "master"
+			application: "appName",
+			profiles:    []string{"profile"},
+			response:    NewMockHttpResponse(http.StatusInternalServerError, ""),
+			err:         errors.New("server responded with status code '500' and body ''"),
+		},
+		{
+			name:        "No Response Body",
+			label:       "master"
+			application: "appName",
+			profiles:    []string{"profile"},
+			response:    NewMockHttpResponse(http.StatusOK, ""),
+			err:         errors.New("failed to decode response from url: EOF"),
+		},
+		{
+			name:        "HTTP Error",
+			label:       "master"
+			application: "appName",
+			profiles:    []string{"profile"},
+			err:         errors.New("failed to retrieve from http://localhost:8888/appName/profile/master: Get \"http://localhost:8888/appName/profile/master\": http: RoundTripper implementation (cloudconfigclient_test.RoundTripFunc) returned a nil *Response with a nil error"),
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			httpClient := NewMockHttpClient(func(req *http.Request) *http.Response {
+				if test.checker != nil {
+					test.checker(t, req)
+				}
+				return test.response
+			})
+			client, err := cloudconfigclient.New(cloudconfigclient.Local(httpClient, "http://localhost:8888"))
+			require.NoError(t, err)
+			configuration, err := client.GetConfigurationWithLabel(test.label, test.application, test.profiles...)
+			if err != nil {
+				require.Error(t, err)
+				require.Equal(t, test.err.Error(), err.Error())
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, test.expected, configuration)
+			}
+		})
+	}
+}
 
 func TestSource_GetPropertySource(t *testing.T) {
 	source := cloudconfigclient.Source{
