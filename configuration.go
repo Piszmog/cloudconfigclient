@@ -152,6 +152,7 @@ type Configuration interface {
 	// GetConfiguration retrieves the configurations/property sources of an application based on the name of the application
 	// and the profiles of the application.
 	GetConfiguration(applicationName string, profiles ...string) (Source, error)
+	GetConfigurationWithLabel(label string, applicationName string, profiles ...string) (Source, error)
 }
 
 // GetConfiguration retrieves the configurations/property sources of an application based on the name of the application
