@@ -127,7 +127,7 @@ func TestClient_GetConfigurationWithLabel(t *testing.T) {
 	}{
 		{
 			name:        "Get Config",
-			label:       "master"
+			label:       "master",
 			application: "appName",
 			profiles:    []string{"profile"},
 			checker: func(t *testing.T, request *http.Request) {
@@ -142,7 +142,7 @@ func TestClient_GetConfigurationWithLabel(t *testing.T) {
 		},
 		{
 			name:        "Multiple Profiles",
-			label:       "master"
+			label:       "master",
 			application: "appName",
 			profiles:    []string{"profile1", "profile2", "profile3"},
 			checker: func(t *testing.T, request *http.Request) {
@@ -157,7 +157,7 @@ func TestClient_GetConfigurationWithLabel(t *testing.T) {
 		},
 		{
 			name:        "Not Found",
-			label:       "master"
+			label:       "master",
 			application: "appName",
 			profiles:    []string{"profile"},
 			response:    NewMockHttpResponse(http.StatusNotFound, ""),
@@ -165,7 +165,7 @@ func TestClient_GetConfigurationWithLabel(t *testing.T) {
 		},
 		{
 			name:        "Server Error",
-			label:       "master"
+			label:       "master",
 			application: "appName",
 			profiles:    []string{"profile"},
 			response:    NewMockHttpResponse(http.StatusInternalServerError, ""),
@@ -173,7 +173,7 @@ func TestClient_GetConfigurationWithLabel(t *testing.T) {
 		},
 		{
 			name:        "No Response Body",
-			label:       "master"
+			label:       "master",
 			application: "appName",
 			profiles:    []string{"profile"},
 			response:    NewMockHttpResponse(http.StatusOK, ""),
@@ -181,7 +181,7 @@ func TestClient_GetConfigurationWithLabel(t *testing.T) {
 		},
 		{
 			name:        "HTTP Error",
-			label:       "master"
+			label:       "master",
 			application: "appName",
 			profiles:    []string{"profile"},
 			err:         errors.New("failed to retrieve from http://localhost:8888/appName/profile/master: Get \"http://localhost:8888/appName/profile/master\": http: RoundTripper implementation (cloudconfigclient_test.RoundTripFunc) returned a nil *Response with a nil error"),
