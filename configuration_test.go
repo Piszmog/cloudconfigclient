@@ -161,7 +161,7 @@ func TestClient_GetConfigurationWithLabel(t *testing.T) {
 			application: "appName",
 			profiles:    []string{"profile"},
 			response:    NewMockHttpResponse(http.StatusNotFound, ""),
-			err:         errors.New("failed to find configuration for application appName with profiles [profile]"),
+			err:         errors.New("failed to find configuration for application appName with profiles [profile] and label master"),
 		},
 		{
 			name:        "Server Error",
