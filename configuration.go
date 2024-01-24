@@ -152,6 +152,9 @@ type Configuration interface {
 	// GetConfiguration retrieves the configurations/property sources of an application based on the name of the application
 	// and the profiles of the application.
 	GetConfiguration(applicationName string, profiles ...string) (Source, error)
+	// GetConfigurationWithLabel retrieves the configurations/property sources of an application based on the name of the application
+	// and the profiles of the application and the label.
+	GetConfigurationWithLabel(label string, applicationName string, profiles ...string) (Source, error)
 }
 
 // GetConfiguration retrieves the configurations/property sources of an application based on the name of the application
@@ -169,6 +172,23 @@ func (c *Client) GetConfiguration(applicationName string, profiles ...string) (S
 		return source, nil
 	}
 	return Source{}, fmt.Errorf("failed to find configuration for application %s with profiles %s", applicationName, profiles)
+}
+
+// GetConfigurationWithLabel retrieves the configurations/property sources of an application based on the name of the application
+// and the profiles of the application and the label.
+func (c *Client) GetConfigurationWithLabel(label string, applicationName string, profiles ...string) (Source, error) {
+	var source Source
+	paths := []string{applicationName, joinProfiles(profiles), label}
+	for _, client := range c.clients {
+		if err := client.GetResource(paths, nil, &source); err != nil {
+			if errors.Is(err, ErrResourceNotFound) {
+				continue
+			}
+			return Source{}, err
+		}
+		return source, nil
+	}
+	return Source{}, fmt.Errorf("failed to find configuration for application %s with profiles %s and label %s", applicationName, profiles, label)
 }
 
 func joinProfiles(profiles []string) string {
