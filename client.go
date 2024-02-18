@@ -2,6 +2,7 @@ package cloudconfigclient
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"net/http"
@@ -64,21 +65,30 @@ func newLocalClientFromEnv(client *http.Client) ([]*HTTPClient, error) {
 	if len(localUrls) == 0 {
 		return nil, fmt.Errorf("no local Config Server URLs provided in environment variable %s", EnvironmentLocalConfigServerUrls)
 	}
-	return newLocalClient(client, strings.Split(localUrls, ",")), nil
+	return newSimpleClient(client, "", strings.Split(localUrls, ",")), nil
 }
 
 // Local creates a clients for a locally running Config Servers.
 func Local(client *http.Client, urls ...string) Option {
 	return func(clients *[]*HTTPClient) error {
-		*clients = append(*clients, newLocalClient(client, urls)...)
+		*clients = append(*clients, newSimpleClient(client, "", urls)...)
 		return nil
 	}
 }
 
-func newLocalClient(client *http.Client, urls []string) []*HTTPClient {
+// Basic creates a clients for a Config Server based on the provided basic authentication information.
+func Basic(client *http.Client, username, password string, urls ...string) Option {
+	return func(clients *[]*HTTPClient) error {
+		auth := "Basic " + base64.StdEncoding.EncodeToString([]byte(username+":"+password))
+		*clients = append(*clients, newSimpleClient(client, auth, urls)...)
+		return nil
+	}
+}
+
+func newSimpleClient(client *http.Client, auth string, urls []string) []*HTTPClient {
 	clients := make([]*HTTPClient, len(urls), len(urls))
 	for index, baseUrl := range urls {
-		clients[index] = &HTTPClient{BaseURL: baseUrl, Client: client}
+		clients[index] = &HTTPClient{BaseURL: baseUrl, Client: client, Authorization: auth}
 	}
 	return clients
 }

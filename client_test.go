@@ -103,6 +103,12 @@ func TestOption(t *testing.T) {
 			},
 		},
 		{
+
+			name:     "Basic",
+			option:   cloudconfigclient.Basic(&http.Client{}, "username", "password", "http://localhost:8880"),
+			expected: []*cloudconfigclient.HTTPClient{{BaseURL: "http://localhost:8880", Client: &http.Client{}, Authorization: "Basic dXNlcm5hbWU6cGFzc3dvcmQ="}},
+		},
+		{
 			name: "DefaultCFService",
 			setup: func() {
 				os.Setenv("VCAP_SERVICES", `{

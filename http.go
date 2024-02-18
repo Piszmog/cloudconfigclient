@@ -5,7 +5,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"path"
@@ -17,7 +17,11 @@ import (
 // HTTPClient is a wrapper for http.Client.
 type HTTPClient struct {
 	*http.Client
+	// BaseURL is the base URL for the Config Server.
 	BaseURL string
+	// Authorization is the authorization header value for the Config Server. If not provided, no authorization header is not explicitly set.
+	// If the client is using OAuth2, the authorization header is set automatically.
+	Authorization string
 }
 
 // ErrResourceNotFound is a special error that is used to propagate 404s.
@@ -45,7 +49,7 @@ func (h *HTTPClient) GetResource(paths []string, params map[string]string, dest 
 	}
 	if resp.StatusCode != http.StatusOK {
 		var b []byte
-		b, err = ioutil.ReadAll(resp.Body)
+		b, err = io.ReadAll(resp.Body)
 		if err != nil {
 			return fmt.Errorf("failed to read body with status code '%d': %w", resp.StatusCode, err)
 		}
@@ -89,7 +93,7 @@ func (h *HTTPClient) GetResourceRaw(paths []string, params map[string]string) ([
 		return nil, ErrResourceNotFound
 	}
 	var b []byte
-	b, err = ioutil.ReadAll(resp.Body)
+	b, err = io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read body with status code '%d': %w", resp.StatusCode, err)
 	}
@@ -105,7 +109,14 @@ func (h *HTTPClient) Get(paths []string, params map[string]string) (*http.Respon
 	if err != nil {
 		return nil, fmt.Errorf("failed to create url: %w", err)
 	}
-	response, err := h.Client.Get(fullUrl)
+	req, err := http.NewRequest(http.MethodGet, fullUrl, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request for %s: %w", fullUrl, err)
+	}
+	if h.Authorization != "" {
+		req.Header.Set("Authorization", h.Authorization)
+	}
+	response, err := h.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to retrieve from %s: %w", fullUrl, err)
 	}

@@ -3,7 +3,7 @@ package cloudconfigclient_test
 import (
 	"bytes"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 
@@ -29,7 +29,7 @@ func NewMockHttpResponse(code int, body string) *http.Response {
 	return &http.Response{
 		StatusCode: code,
 		// Send response to be tested
-		Body: ioutil.NopCloser(bytes.NewBufferString(body)),
+		Body: io.NopCloser(bytes.NewBufferString(body)),
 		// Must be set to non-nil value or it panics
 		Header: make(http.Header),
 	}
@@ -39,6 +39,7 @@ func TestHTTPClient_Get(t *testing.T) {
 	tests := []struct {
 		name     string
 		baseURL  string
+		auth     string
 		paths    []string
 		params   map[string]string
 		response *http.Response
@@ -61,6 +62,7 @@ func TestHTTPClient_Get(t *testing.T) {
 			response: NewMockHttpResponse(200, ""),
 			checker: func(t *testing.T, request *http.Request) {
 				require.Equal(t, "/", request.URL.RequestURI())
+				require.Empty(t, request.Header.Get("Authorization"))
 			},
 		},
 		{
@@ -91,6 +93,15 @@ func TestHTTPClient_Get(t *testing.T) {
 				require.Equal(t, "/foo/bar?field=value", request.URL.RequestURI())
 			},
 		},
+		{
+			name:     "Correct Request URI With Auth",
+			baseURL:  "http://something",
+			auth:     "Basic dXNlcjpwYXNz",
+			response: NewMockHttpResponse(200, ""),
+			checker: func(t *testing.T, request *http.Request) {
+				require.Equal(t, "Basic dXNlcjpwYXNz", request.Header.Get("Authorization"))
+			},
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -100,7 +111,7 @@ func TestHTTPClient_Get(t *testing.T) {
 				}
 				return test.response
 			})
-			httpClient := cloudconfigclient.HTTPClient{BaseURL: test.baseURL, Client: client}
+			httpClient := cloudconfigclient.HTTPClient{BaseURL: test.baseURL, Client: client, Authorization: test.auth}
 			_, err := httpClient.Get(test.paths, test.params)
 			if err != nil {
 				require.Error(t, err)
