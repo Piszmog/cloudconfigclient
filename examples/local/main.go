@@ -11,7 +11,6 @@ import (
 
 func main() {
 	// ensure you have the Config Server running locally...
-
 	client, err := cloudconfigclient.New(cloudconfigclient.Local(&http.Client{}, "http://localhost:8888"))
 	if err != nil {
 		log.Fatalln(err)

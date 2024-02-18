@@ -3,21 +3,21 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"strings"
 
 	"github.com/Piszmog/cloudconfigclient/v2"
 )
 
 func main() {
-	// ensure you have the Config Server running locally (or in the cloud) and configured for OAuth2
-	client, err := cloudconfigclient.New(cloudconfigclient.OAuth2("config server uri", "client id",
-		"client secret", "access token uri"))
+	// ensure you have the Config Server running locally...
+	client, err := cloudconfigclient.New(cloudconfigclient.Basic(&http.Client{}, "username", "password", "http://localhost:8888"))
 	if err != nil {
 		log.Fatalln(err)
 	}
 
 	// load a config file
-	configuration, err := client.GetConfiguration("test-app", "oauth")
+	configuration, err := client.GetConfiguration("test-app", "local")
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -28,11 +28,11 @@ func main() {
 	}
 
 	// or manually access the values
-	localProp, err := configuration.GetPropertySource("application-oauth.yml")
+	localProp, err := configuration.GetPropertySource("application-local.yml")
 	if err != nil {
-		log.Fatalln("failed to find oauth property file")
+		log.Fatalln("failed to find local property file")
 	}
-	fmt.Printf("oauth property file: %+v\n", localProp)
+	fmt.Printf("local property file: %+v\n", localProp)
 	// handle all config properties
 	configuration.HandlePropertySources(func(propertySource cloudconfigclient.PropertySource) {
 		if strings.HasSuffix(propertySource.Name, "test-app.properties") {

@@ -53,6 +53,7 @@ configurations
     1. Call `LocalEnv()`. Set the environment variable `CONFIG_SERVER_URLS`. It is a comma separated list of all the
        base URLs
     2. Call `Local(baseUrls ...string)`. Provide the array of base URLs of Config Servers.
+* If the config server is protected with basic auth, call `Basic` with the username and password.
 * For running in Cloud Foundry, ensure a Config Server is bounded to the application. `VCAP_SERVICES` will be provided
   as an environment variables with the credentials to access the Config Server
 * For connecting to a Config Server via OAuth2 and not deployed to Cloud Foundry, an OAuth2 Client can be created
@@ -80,6 +81,8 @@ func main() {
 	configClient, err := cloudconfigclient.New(cloudconfigclient.LocalEnv(&http.Client{}))
 	// Or
 	configClient, err = cloudconfigclient.New(cloudconfigclient.Local(&http.Client{}, "http://localhost:8888"))
+	// or to create a Client for a Spring Config Server using Basic Authentication
+	configClient, err = cloudconfigclient.New(cloudconfigclient.Basic(&http.Client{}, "username", "password" "http://localhost:8888"))
 	// or to create a Client for a Spring Config Server in Cloud Foundry
 	configClient, err = cloudconfigclient.New(cloudconfigclient.DefaultCFService())
 	// or to create a Client for a Spring Config Server with OAuth2

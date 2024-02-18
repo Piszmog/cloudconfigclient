@@ -11,7 +11,6 @@ import (
 func main() {
 	// ensure you have set the environment variable 'VCAP_SERVICES' that contains the information to connect to the
 	// Config Server
-
 	client, err := cloudconfigclient.New(cloudconfigclient.DefaultCFService())
 	if err != nil {
 		log.Fatalln(err)
