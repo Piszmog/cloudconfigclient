@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/Piszmog/cloudconfigclient/v2"
 	"log"
 	"strings"
+
+	"github.com/Piszmog/cloudconfigclient/v2"
 )
 
 func main() {

@@ -2,11 +2,12 @@ package cloudconfigclient_test
 
 import (
 	"errors"
+	"net/http"
+	"testing"
+
 	"github.com/Piszmog/cloudconfigclient/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"net/http"
-	"testing"
 )
 
 const (

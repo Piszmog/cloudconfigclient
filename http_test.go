@@ -3,11 +3,12 @@ package cloudconfigclient_test
 import (
 	"bytes"
 	"errors"
-	"github.com/Piszmog/cloudconfigclient/v2"
-	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"net/http"
 	"testing"
+
+	"github.com/Piszmog/cloudconfigclient/v2"
+	"github.com/stretchr/testify/require"
 )
 
 type RoundTripFunc func(req *http.Request) *http.Response
