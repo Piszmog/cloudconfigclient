@@ -62,7 +62,7 @@ func (s *Source) HandlePropertySources(handler PropertySourceHandler) {
 // This function is not optimized (ugly) and is intended to only be used at startup.
 func (s *Source) Unmarshal(v interface{}) error {
 	// covert to a map[string]interface{} so we can convert to the target type
-	obj, err := toJson(s.PropertySources)
+	obj, err := toJSON(s.PropertySources)
 	if err != nil {
 		return err
 	}
@@ -77,7 +77,7 @@ func (s *Source) Unmarshal(v interface{}) error {
 
 var sliceRegex = regexp.MustCompile(`(.*)\[(\d+)]`)
 
-func toJson(propertySources []PropertySource) (map[string]interface{}, error) {
+func toJSON(propertySources []PropertySource) (map[string]interface{}, error) {
 	// get ready for a wild ride...
 	output := map[string]interface{}{}
 	// save the root, so we can get back there when we walk the tree

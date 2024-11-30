@@ -105,40 +105,40 @@ func (h *HTTPClient) GetResourceRaw(paths []string, params map[string]string) ([
 
 // Get performs a http.MethodGet operation. Builds the URL based on the provided paths and params.
 func (h *HTTPClient) Get(paths []string, params map[string]string) (*http.Response, error) {
-	fullUrl, err := newURL(h.BaseURL, paths, params)
+	fullURL, err := newURL(h.BaseURL, paths, params)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create url: %w", err)
 	}
-	req, err := http.NewRequest(http.MethodGet, fullUrl, nil)
+	req, err := http.NewRequest(http.MethodGet, fullURL, nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create request for %s: %w", fullUrl, err)
+		return nil, fmt.Errorf("failed to create request for %s: %w", fullURL, err)
 	}
 	if h.Authorization != "" {
 		req.Header.Set("Authorization", h.Authorization)
 	}
 	response, err := h.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("failed to retrieve from %s: %w", fullUrl, err)
+		return nil, fmt.Errorf("failed to retrieve from %s: %w", fullURL, err)
 	}
 	return response, nil
 }
 
 func newURL(baseURL string, paths []string, params map[string]string) (string, error) {
-	parseUrl, err := url.Parse(baseURL)
+	parseURL, err := url.Parse(baseURL)
 	if err != nil {
 		return "", fmt.Errorf("failed to parse url %s: %w", baseURL, err)
 	}
-	if paths != nil {
+	if len(paths) > 0 {
 		for _, p := range paths {
-			parseUrl.Path = path.Join(parseUrl.Path, p)
+			parseURL.Path = path.Join(parseURL.Path, p)
 		}
 	}
 	if params != nil {
-		query := parseUrl.Query()
+		query := parseURL.Query()
 		for key, value := range params {
 			query.Set(key, value)
 		}
-		parseUrl.RawQuery = query.Encode()
+		parseURL.RawQuery = query.Encode()
 	}
-	return parseUrl.String(), nil
+	return parseURL.String(), nil
 }

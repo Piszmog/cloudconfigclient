@@ -86,9 +86,9 @@ func Basic(client *http.Client, username, password string, urls ...string) Optio
 }
 
 func newSimpleClient(client *http.Client, auth string, urls []string) []*HTTPClient {
-	clients := make([]*HTTPClient, len(urls), len(urls))
-	for index, baseUrl := range urls {
-		clients[index] = &HTTPClient{BaseURL: baseUrl, Client: client, Authorization: auth}
+	clients := make([]*HTTPClient, len(urls))
+	for index, baseURL := range urls {
+		clients[index] = &HTTPClient{BaseURL: baseURL, Client: client, Authorization: auth}
 	}
 	return clients
 }
@@ -147,7 +147,7 @@ func newCloudClientForService(name string, services map[string][]cfservices.Serv
 	if err != nil {
 		return nil, fmt.Errorf("failed to create cloud Client: %w", err)
 	}
-	clients := make([]*HTTPClient, len(creds.Credentials), len(creds.Credentials))
+	clients := make([]*HTTPClient, len(creds.Credentials))
 	for i, cred := range creds.Credentials {
 		clients[i] = &HTTPClient{BaseURL: cred.Uri, Client: newOAuth2Client(cred.ClientId, cred.ClientSecret, cred.AccessTokenUri)}
 	}
@@ -155,18 +155,18 @@ func newCloudClientForService(name string, services map[string][]cfservices.Serv
 }
 
 // OAuth2 creates a Client for a Config Server based on the provided OAuth2.0 information.
-func OAuth2(baseURL string, clientId string, secret string, tokenURI string) Option {
+func OAuth2(baseURL string, clientID string, secret string, tokenURI string) Option {
 	return func(clients *[]*HTTPClient) error {
-		*clients = append(*clients, &HTTPClient{BaseURL: baseURL, Client: newOAuth2Client(clientId, secret, tokenURI)})
+		*clients = append(*clients, &HTTPClient{BaseURL: baseURL, Client: newOAuth2Client(clientID, secret, tokenURI)})
 		return nil
 	}
 }
 
-func newOAuth2Client(clientId string, secret string, tokenURI string) *http.Client {
-	config := newOAuth2Config(clientId, secret, tokenURI)
+func newOAuth2Client(clientID string, secret string, tokenURI string) *http.Client {
+	config := newOAuth2Config(clientID, secret, tokenURI)
 	return config.Client(context.Background())
 }
 
-func newOAuth2Config(clientId string, secret string, tokenURI string) *clientcredentials.Config {
-	return &clientcredentials.Config{ClientID: clientId, ClientSecret: secret, TokenURL: tokenURI}
+func newOAuth2Config(clientID string, secret string, tokenURI string) *clientcredentials.Config {
+	return &clientcredentials.Config{ClientID: clientID, ClientSecret: secret, TokenURL: tokenURI}
 }
