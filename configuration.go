@@ -77,7 +77,7 @@ func (s *Source) Unmarshal(v interface{}) error {
 }
 
 var sliceRegex = regexp.MustCompile(`(.*)\[(\d+)]`)
-var exprRegex = regexp.MustCompile(`\$\{([^:]*)?(:.*)\}`)
+var exprRegex = regexp.MustCompile(`\$\{([^:]+)(:.+)?\}`)
 
 func toString(v interface{}) string {
 	return fmt.Sprintf("%v", v)
