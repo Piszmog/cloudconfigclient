@@ -1,4 +1,4 @@
-module github.com/Piszmog/cloudconfigclient/v2
+module github.com/ngaggi73/cloudconfigclient/v2
 
 go 1.20
 
