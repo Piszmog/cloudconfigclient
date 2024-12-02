@@ -5,7 +5,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/Piszmog/cloudconfigclient/v2"
+	"github.com/ngaggi73/cloudconfigclient/v2"
 )
 
 func main() {

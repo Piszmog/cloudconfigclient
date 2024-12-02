@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/Piszmog/cloudconfigclient/v2"
+	"github.com/ngaggi73/cloudconfigclient/v2"
 	"github.com/stretchr/testify/require"
 )
 
