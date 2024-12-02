@@ -79,20 +79,25 @@ func (s *Source) Unmarshal(v interface{}) error {
 var sliceRegex = regexp.MustCompile(`(.*)\[(\d+)]`)
 var exprRegex = regexp.MustCompile(`\$\{([^:]*)?(:.*)\}`)
 
+func toString(v interface{}) string {
+	return fmt.Sprintf("%v", v)
+}
+
 func resolveValue(v interface{}, dict map[string]interface{}) interface{} {
-	matches := exprRegex.FindStringSubmatch(fmt.Sprintf("%v", v))
+	s := toString(v)
+	matches := exprRegex.FindStringSubmatch(s)
 	if matches != nil {
 		name := matches[1]
 		if r, ok := dict[name]; ok {
-			return resolveValue(r, dict)
+			return strings.Replace(s, matches[0], toString(resolveValue(r, dict)), -1)
 		}
 
 		if r, ok := os.LookupEnv(name); ok {
-			return resolveValue(r, dict)
+			return strings.Replace(s, matches[0], toString(resolveValue(r, dict)), -1)
 		}
 
 		if len(matches) > 1 {
-			return matches[2][1:]
+			return strings.Replace(s, matches[0], matches[2][1:], -1)
 		}
 	}
 

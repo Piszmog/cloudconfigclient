@@ -383,10 +383,10 @@ func TestSource_Unmarshal(t *testing.T) {
 							"intVal":                   1,
 							"sliceString[0]":           "${notdefined.string:value2}",
 							"sliceInt[0]":              2,
-							"sliceStruct[0].stringVal": "${default.values.string:value5}",
+							"sliceStruct[0].stringVal": "prefix_${default.values.string:value5}",
 							"sliceStruct[0].intVal":    4,
 							"sliceStruct[1].intVal":    5,
-							"sliceStruct[1].stringVal": "${ENV_VAR:value6}",
+							"sliceStruct[1].stringVal": "${ENV_VAR:value6}_suffix",
 						},
 					},
 				},
@@ -402,11 +402,11 @@ func TestSource_Unmarshal(t *testing.T) {
 				},
 				SliceStruct: []nestedStruct{
 					{
-						StringVal: "defaultString",
+						StringVal: "prefix_defaultString",
 						IntVal:    4,
 					},
 					{
-						StringVal: "environmentValue",
+						StringVal: "environmentValue_suffix",
 						IntVal:    5,
 					},
 				},
