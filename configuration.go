@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -76,10 +77,40 @@ func (s *Source) Unmarshal(v interface{}) error {
 }
 
 var sliceRegex = regexp.MustCompile(`(.*)\[(\d+)]`)
+var exprRegex = regexp.MustCompile(`\$\{([^:]*)?(:.*)\}`)
+
+func resolveValue(v interface{}, dict map[string]interface{}) interface{} {
+	matches := exprRegex.FindStringSubmatch(fmt.Sprintf("%v", v))
+	if matches != nil {
+		name := matches[1]
+		if r, ok := dict[name]; ok {
+			return resolveValue(r, dict)
+		}
+
+		if r, ok := os.LookupEnv(name); ok {
+			return resolveValue(r, dict)
+		}
+
+		if len(matches) > 1 {
+			return matches[2][1:]
+		}
+	}
+
+	return v
+}
 
 func toJSON(propertySources []PropertySource) (map[string]interface{}, error) {
 	// get ready for a wild ride...
 	output := map[string]interface{}{}
+
+	// flat properties dictionary to be used for value resolution
+	flatDictionary := map[string]interface{}{}
+	for _, propertySource := range propertySources {
+		for k, v := range propertySource.Source {
+			flatDictionary[k] = v
+		}
+	}
+
 	// save the root, so we can get back there when we walk the tree
 	root := output
 	_ = root
@@ -96,7 +127,7 @@ func toJSON(propertySources []PropertySource) (map[string]interface{}, error) {
 					}
 					if len(keys)-1 == i {
 						// the value go straight into the slice, we don't have any slice of objects
-						output[actualKey] = append(output[actualKey].([]interface{}), v)
+						output[actualKey] = append(output[actualKey].([]interface{}), resolveValue(v, flatDictionary))
 						output = root
 					} else {
 						// ugh... we have a slice of objects
@@ -124,7 +155,7 @@ func toJSON(propertySources []PropertySource) (map[string]interface{}, error) {
 					}
 				} else if len(keys)-1 == i {
 					// the value go straight into the key
-					output[key] = v
+					output[key] = resolveValue(v, flatDictionary)
 					output = root
 				} else {
 					// need to create a nested object

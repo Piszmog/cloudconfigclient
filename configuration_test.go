@@ -3,6 +3,7 @@ package cloudconfigclient_test
 import (
 	"errors"
 	"net/http"
+	"os"
 	"testing"
 
 	"github.com/Piszmog/cloudconfigclient/v2"
@@ -361,7 +362,59 @@ func TestSource_Unmarshal(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "Value resolution",
+			source: cloudconfigclient.Source{
+				PropertySources: []cloudconfigclient.PropertySource{
+					{
+						Name: "application-foo-dev.yml",
+						Source: map[string]interface{}{
+							"sliceStruct[0].stringVal": "overwritten.value5",
+							"sliceStruct[0].intVal":    40,
+							"sliceStruct[1].intVal":    50,
+							"sliceStruct[1].stringVal": "overwritten.value6",
+						},
+					},
+					{
+						Name: "application-foo.yml",
+						Source: map[string]interface{}{
+							"default.values.string":    "defaultString",
+							"stringVal":                "value1",
+							"intVal":                   1,
+							"sliceString[0]":           "${notdefined.string:value2}",
+							"sliceInt[0]":              2,
+							"sliceStruct[0].stringVal": "${default.values.string:value5}",
+							"sliceStruct[0].intVal":    4,
+							"sliceStruct[1].intVal":    5,
+							"sliceStruct[1].stringVal": "${ENV_VAR:value6}",
+						},
+					},
+				},
+			},
+			expected: testStruct{
+				StringVal: "value1",
+				IntVal:    1,
+				SliceString: []string{
+					"value2",
+				},
+				SliceInt: []int{
+					2,
+				},
+				SliceStruct: []nestedStruct{
+					{
+						StringVal: "defaultString",
+						IntVal:    4,
+					},
+					{
+						StringVal: "environmentValue",
+						IntVal:    5,
+					},
+				},
+			},
+		},
 	}
+
+	os.Setenv("ENV_VAR", "environmentValue")
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			var actual testStruct
