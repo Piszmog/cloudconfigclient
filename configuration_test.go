@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/ngaggi73/cloudconfigclient/v2"
+	"github.com/Piszmog/cloudconfigclient/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
