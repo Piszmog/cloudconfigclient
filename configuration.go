@@ -60,8 +60,8 @@ func (s *Source) HandlePropertySources(handler PropertySourceHandler) {
 // The provided pointer struct must use JSON tags to map to the PropertySource.Source.
 //
 // This function is not optimized (ugly) and is intended to only be used at startup.
-func (s *Source) Unmarshal(v interface{}) error {
-	// covert to a map[string]interface{} so we can convert to the target type
+func (s *Source) Unmarshal(v any) error {
+	// covert to a map[string]any so we can convert to the target type
 	obj, err := toJSON(s.PropertySources)
 	if err != nil {
 		return err
@@ -77,9 +77,9 @@ func (s *Source) Unmarshal(v interface{}) error {
 
 var sliceRegex = regexp.MustCompile(`(.*)\[(\d+)]`)
 
-func toJSON(propertySources []PropertySource) (map[string]interface{}, error) {
+func toJSON(propertySources []PropertySource) (map[string]any, error) {
 	// get ready for a wild ride...
-	output := map[string]interface{}{}
+	output := map[string]any{}
 	// save the root, so we can get back there when we walk the tree
 	root := output
 	_ = root
@@ -92,11 +92,11 @@ func toJSON(propertySources []PropertySource) (map[string]interface{}, error) {
 				if matches != nil {
 					actualKey := matches[1]
 					if _, ok := output[actualKey]; !ok {
-						output[actualKey] = []interface{}{}
+						output[actualKey] = []any{}
 					}
 					if len(keys)-1 == i {
 						// the value go straight into the slice, we don't have any slice of objects
-						output[actualKey] = append(output[actualKey].([]interface{}), v)
+						output[actualKey] = append(output[actualKey].([]any), v)
 						output = root
 					} else {
 						// ugh... we have a slice of objects
@@ -105,20 +105,20 @@ func toJSON(propertySources []PropertySource) (map[string]interface{}, error) {
 						if err != nil {
 							return nil, err
 						}
-						var obj map[string]interface{}
-						slice := output[actualKey].([]interface{})
+						var obj map[string]any
+						slice := output[actualKey].([]any)
 						// determine if the index we are walking exists yet in the slice we have built up
 						if len(slice) > index {
-							obj = slice[index].(map[string]interface{})
+							obj = slice[index].(map[string]any)
 							if obj == nil {
-								obj = map[string]interface{}{}
+								obj = map[string]any{}
 							}
 						} else {
 							// the index does not exist, so we need to create it
 							for j := len(slice); j <= index; j++ {
-								output[actualKey] = append(output[actualKey].([]interface{}), map[string]interface{}{})
+								output[actualKey] = append(output[actualKey].([]any), map[string]any{})
 							}
-							obj = output[actualKey].([]interface{})[index].(map[string]interface{})
+							obj = output[actualKey].([]any)[index].(map[string]any)
 						}
 						output = obj
 					}
@@ -129,9 +129,9 @@ func toJSON(propertySources []PropertySource) (map[string]interface{}, error) {
 				} else {
 					// need to create a nested object
 					if _, ok := output[key]; !ok {
-						output[key] = map[string]interface{}{}
+						output[key] = map[string]any{}
 					}
-					output = output[key].(map[string]interface{})
+					output = output[key].(map[string]any)
 				}
 			}
 		}
@@ -143,8 +143,8 @@ func toJSON(propertySources []PropertySource) (map[string]interface{}, error) {
 //
 // A property source is either a YAML or a PROPERTIES file located in the repository that a Config Server is pointed at.
 type PropertySource struct {
-	Source map[string]interface{} `json:"source"`
-	Name   string                 `json:"name"`
+	Source map[string]any `json:"source"`
+	Name   string         `json:"name"`
 }
 
 // Configuration interface for retrieving an application's configuration files from the Config Server.

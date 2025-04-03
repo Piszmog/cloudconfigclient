@@ -16,11 +16,11 @@ type Resource interface {
 	// GetFile retrieves the specified file from the provided directory from the Config Server's default branch.
 	//
 	// The file will be deserialized into the specified interface type.
-	GetFile(directory string, file string, interfaceType interface{}) error
+	GetFile(directory string, file string, interfaceType any) error
 	// GetFileFromBranch retrieves the specified file from the provided branch in the provided directory.
 	//
 	// The file will be deserialized into the specified interface type.
-	GetFileFromBranch(branch string, directory string, file string, interfaceType interface{}) error
+	GetFileFromBranch(branch string, directory string, file string, interfaceType any) error
 	// GetFileRaw retrieves the file from the default branch as a byte slice.
 	GetFileRaw(directory string, file string) ([]byte, error)
 	// GetFileFromBranchRaw retrieves the file from the specified branch as a byte slice.
@@ -30,18 +30,18 @@ type Resource interface {
 // GetFile retrieves the specified file from the provided directory from the Config Server's default branch.
 //
 // The file will be deserialized into the specified interface type.
-func (c *Client) GetFile(directory string, file string, interfaceType interface{}) error {
+func (c *Client) GetFile(directory string, file string, interfaceType any) error {
 	return c.getFile([]string{defaultApplicationName, defaultApplicationProfile, directory, file}, useDefaultLabel, interfaceType)
 }
 
 // GetFileFromBranch retrieves the specified file from the provided branch in the provided directory.
 //
 // The file will be deserialized into the specified interface type.
-func (c *Client) GetFileFromBranch(branch string, directory string, file string, interfaceType interface{}) error {
+func (c *Client) GetFileFromBranch(branch string, directory string, file string, interfaceType any) error {
 	return c.getFile([]string{defaultApplicationName, defaultApplicationProfile, branch, directory, file}, nil, interfaceType)
 }
 
-func (c *Client) getFile(paths []string, params map[string]string, interfaceType interface{}) error {
+func (c *Client) getFile(paths []string, params map[string]string, interfaceType any) error {
 	fileFound := false
 	for _, client := range c.clients {
 		if err := client.GetResource(paths, params, interfaceType); err != nil {
