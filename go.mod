@@ -1,6 +1,8 @@
 module github.com/Piszmog/cloudconfigclient/v2
 
-go 1.20
+go 1.23.0
+
+toolchain go1.24.1
 
 require (
 	github.com/Piszmog/cfservices v1.5.0

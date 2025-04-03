@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strings"
 
 	"github.com/Piszmog/cloudconfigclient/v2"
 )
@@ -35,9 +34,9 @@ func main() {
 	fmt.Printf("local property file: %+v\n", localProp)
 	// handle all config properties
 	configuration.HandlePropertySources(func(propertySource cloudconfigclient.PropertySource) {
-		if strings.HasSuffix(propertySource.Name, "test-app.properties") {
-			// TODO save off values
-		}
+		//if strings.HasSuffix(propertySource.Name, "test-app.properties") {
+		// TODO save off values
+		//}
 	})
 
 	// load a specific file (e.g. json/txt)

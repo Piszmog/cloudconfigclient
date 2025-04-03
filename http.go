@@ -35,7 +35,7 @@ const (
 // the response to the specified destination.
 //
 // Capable of unmarshalling YAML, JSON, and XML. If file type is of another type, use GetResourceRaw instead.
-func (h *HTTPClient) GetResource(paths []string, params map[string]string, dest interface{}) error {
+func (h *HTTPClient) GetResource(paths []string, params map[string]string, dest any) (err error) {
 	if len(paths) == 0 {
 		return errors.New("no resource specified to be retrieved")
 	}
@@ -43,7 +43,11 @@ func (h *HTTPClient) GetResource(paths []string, params map[string]string, dest 
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if cerr := resp.Body.Close(); cerr != nil {
+			err = errors.Join(err, fmt.Errorf("failed to close body: %w", cerr))
+		}
+	}()
 	if resp.StatusCode == http.StatusNotFound {
 		return ErrResourceNotFound
 	}
@@ -61,7 +65,7 @@ func (h *HTTPClient) GetResource(paths []string, params map[string]string, dest 
 	return nil
 }
 
-func decodeResponseBody(file string, resp *http.Response, dest interface{}) error {
+func decodeResponseBody(file string, resp *http.Response, dest any) error {
 	if strings.Contains(file, ".yml") || strings.Contains(file, ".yaml") {
 		if err := yaml.NewDecoder(resp.Body).Decode(dest); err != nil {
 			return fmt.Errorf(failedToDecodeMessage, err)
@@ -80,7 +84,7 @@ func decodeResponseBody(file string, resp *http.Response, dest interface{}) erro
 
 // GetResourceRaw performs a http.MethodGet operation. Builds the URL based on the provided paths and params. Returns
 // the byte slice response.
-func (h *HTTPClient) GetResourceRaw(paths []string, params map[string]string) ([]byte, error) {
+func (h *HTTPClient) GetResourceRaw(paths []string, params map[string]string) (b []byte, err error) {
 	if len(paths) == 0 {
 		return nil, errors.New("no resource specified to be retrieved")
 	}
@@ -88,11 +92,14 @@ func (h *HTTPClient) GetResourceRaw(paths []string, params map[string]string) ([
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if cerr := resp.Body.Close(); cerr != nil {
+			err = errors.Join(err, fmt.Errorf("failed to close body: %w", cerr))
+		}
+	}()
 	if resp.StatusCode == http.StatusNotFound {
 		return nil, ErrResourceNotFound
 	}
-	var b []byte
 	b, err = io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read body with status code '%d': %w", resp.StatusCode, err)
