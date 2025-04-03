@@ -28,4 +28,15 @@ jobs:
         with:
           go-version-file: 'go.mod'
       - run: go mod download
-      - run: go test -v ./...
+      - name: Test and Calculate Coverage
+        run: go test -v -covermode=count -coverprofile=coverage.out
+      - name: Convert coverage to lcov
+        uses: jandelgado/gcov2lcov-action@v1.1.1
+        with:
+          infile: coverage.out
+          outfile: coverage.lcov
+      - name: Coveralls
+        uses: coverallsapp/github-action@v2.3.6
+        with:
+          github-token: ${{ secrets.github_token }}
+          path-to-lcov: coverage.lcov
