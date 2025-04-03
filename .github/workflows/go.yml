@@ -18,7 +18,6 @@ jobs:
         uses: golangci/golangci-lint-action@v7
         with:
           version: v2.0
-          args: --exclude-files='(.+)_test\.go'
   build:
     name: Build
     runs-on: ubuntu-latest
