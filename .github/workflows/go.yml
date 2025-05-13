@@ -15,9 +15,9 @@ jobs:
           go-version-file: 'go.mod'
       - run: go mod download
       - name: Lint
-        uses: golangci/golangci-lint-action@v7
+        uses: golangci/golangci-lint-action@v8
         with:
-          version: v2.0
+          version: v2.1
           args: --tests=false
   test:
     name: Test
